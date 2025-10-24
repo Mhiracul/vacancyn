@@ -83,7 +83,7 @@ const UserDashboard = () => {
           Array.isArray(alertsRes.data.jobs) ? alertsRes.data.jobs : []
         );
       } catch (error) {
-        console.error("❌ Error fetching user dashboard data:", error);
+        //console.error("❌ Error fetching user dashboard data:", error);
       } finally {
         setLoading(false);
       }

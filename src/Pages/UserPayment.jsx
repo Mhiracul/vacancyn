@@ -29,7 +29,7 @@ const UserPayment = () => {
           setPaid(true);
         }
       } catch (err) {
-        console.error("Payment status check failed:", err);
+        //console.error("Payment status check failed:", err);
       }
     };
     checkPayment();
@@ -50,7 +50,7 @@ const UserPayment = () => {
       const { authorization_url } = res.data;
       window.location.href = authorization_url;
     } catch (error) {
-      console.error("Error initializing payment:", error);
+      //console.error("Error initializing payment:", error);
       alert("Unable to start payment. Try again later.");
     } finally {
       setLoading(false);

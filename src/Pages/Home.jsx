@@ -16,7 +16,7 @@ const Home = () => {
       <Hero />
       <ExperienceFilterPage />
 
-      <JobListing />
+      <JobListing showPagination={false} maxJobs={6} />
       <HowItWorks />
       <div className="2xl:py-20 py-10">
         <div className="bg-gradient-to-r from-[#0867bc] to-[#5fabed]  py-12 px-8 text-center text-white max-w-7xl mx-auto ">
@@ -29,7 +29,7 @@ const Home = () => {
           </p>
           <div className="flex justify-center space-x-4">
             <button className="bg-white text-[#0867bc] px-8 py-3 rounded-lg hover:bg-gray-100 font-medium whitespace-nowrap cursor-pointer">
-              Start Free Review
+              <a href="/cv-review">Start Free Review</a>
             </button>
             <a
               className="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-[#0867bc] font-medium whitespace-nowrap cursor-pointer"

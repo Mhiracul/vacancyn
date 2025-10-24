@@ -22,7 +22,7 @@ const ManageJobs = () => {
       if (data.success) setJobs(data.jobs);
       else toast.error("Failed to fetch jobs!");
     } catch (error) {
-      console.error("Error fetching jobs:", error);
+      //console.error("Error fetching jobs:", error);
       toast.error("Server error while fetching jobs!");
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ const ManageJobs = () => {
         );
       } else toast.error("Failed to update visibility!");
     } catch (err) {
-      console.error("Error updating visibility:", err);
+      //console.error("Error updating visibility:", err);
       toast.error("Server error while updating visibility!");
     }
   };

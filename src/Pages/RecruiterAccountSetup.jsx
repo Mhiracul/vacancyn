@@ -72,7 +72,7 @@ const RecruiterAccountSetup = () => {
         Swal.fire("Error", data.message || "Something went wrong!", "error");
       }
     } catch (error) {
-      console.error("Error saving profile:", error);
+      //console.error("Error saving profile:", error);
       Swal.fire("Error", "Failed to save profile.", "error");
     }
   };

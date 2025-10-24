@@ -89,7 +89,7 @@ const RecruiterLogin = () => {
 
       setLoading(false); // stop loading
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      //console.error(err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Signup failed");
       setLoading(false);
     }
@@ -138,7 +138,7 @@ const RecruiterLogin = () => {
         }
       }, 1500);
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      //console.error(err.response?.data || err.message);
 
       const errorMsg = err.response?.data?.message || "Login failed";
 
@@ -151,6 +151,41 @@ const RecruiterLogin = () => {
       }
 
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    const { value: email } = await Swal.fire({
+      title: "Reset Password",
+      input: "email",
+      inputLabel: "Enter your registered email address",
+      inputPlaceholder: "name@example.com",
+      confirmButtonText: "Send Reset Link",
+      showCancelButton: true,
+      confirmButtonColor: "#0867bc",
+    });
+
+    if (!email) return;
+
+    try {
+      const res = await axios.post(`${BASE_URL}/auth/forgot-password`, {
+        email,
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Email Sent!",
+        text: res.data.message || "Check your inbox for a password reset link.",
+        confirmButtonColor: "#0867bc",
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          err.response?.data?.message ||
+          "Something went wrong. Please try again later.",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -232,9 +267,13 @@ const RecruiterLogin = () => {
                 >
                   {loading ? "Loading..." : "Login"}
                 </button>
-                <p className="text-sm text-blue-600 mt-3 cursor-pointer">
-                  Forgot password?
+                <p
+                  className="text-sm text-[#0867bc] mt-3 cursor-pointer hover:underline"
+                  onClick={handleForgotPassword}
+                >
+                  Forgot Password?
                 </p>
+
                 <div className="flex justify-between mt-8 items-center">
                   <div className="w-[40%] h-0.5 bg-[#e2e2e2]"></div>
                   <h2 className="text-[#e2e2e2] text-sm">OR</h2>

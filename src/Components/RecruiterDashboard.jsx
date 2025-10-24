@@ -32,7 +32,7 @@ const RecruiterDashboard = () => {
         });
         setTotalJobs(res.data.total || 0);
       } catch (error) {
-        console.error("Error fetching total jobs:", error);
+        //console.error("Error fetching total jobs:", error);
       } finally {
         setLoading(false);
       }

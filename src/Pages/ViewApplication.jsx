@@ -33,7 +33,7 @@ const ViewApplication = () => {
         setFilteredApplications(data.applications);
       } else toast.error("Failed to fetch applications!");
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       toast.error("Error fetching applications!");
     } finally {
       setLoading(false);

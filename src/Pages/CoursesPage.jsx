@@ -58,7 +58,7 @@ const CoursesPage = () => {
         ];
         setCourses(sampleCourses);
       } catch (error) {
-        console.error("Failed to fetch courses:", error);
+        //console.error("Failed to fetch courses:", error);
       }
     };
 

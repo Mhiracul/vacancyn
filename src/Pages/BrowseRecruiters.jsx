@@ -20,7 +20,7 @@ const BrowseRecruiters = () => {
       const res = await axios.get(`${BASE_URL}/candidates/rec`);
       setRecruiters(res.data.data || []);
     } catch (err) {
-      console.error(err);
+      //console.error(err);
     }
   };
 

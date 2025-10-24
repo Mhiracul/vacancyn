@@ -17,7 +17,7 @@ const PricingPage = () => {
       window.location.href = authorization_url;
     } catch (err) {
       toast.error("Failed to initialize payment");
-      console.error(err);
+      //console.error(err);
     }
   };
 

@@ -6,12 +6,16 @@ import CVHero from "../Components/CVHero";
 import Header from "../Components/Header";
 import CVFooter from "../Components/CVFooter";
 import BASE_URL from "../config";
+import Footer from "../Components/Footer";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const CVReview = ({ user }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -42,7 +46,7 @@ const CVReview = ({ user }) => {
         toast.error(response.data.message || "AI review failed.");
       }
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       toast.error("Something went wrong. Try again later.");
     } finally {
       setLoading(false);
@@ -78,25 +82,53 @@ const CVReview = ({ user }) => {
                   className="hidden"
                 />
               </label>
+              <div className="flex gap-4 ">
+                <button
+                  onClick={handleAIReview}
+                  disabled={loading}
+                  className={`mt-6 w-full text-sm px-2 py-3 text-white font-semibold rounded-xl transition duration-300 ${
+                    loading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-[#0867bc] to-[#0d8df7] hover:opacity-90"
+                  }`}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="animate-spin h-5 w-5" />
+                      Analyzing CV...
+                    </span>
+                  ) : (
+                    "Start AI Free Review"
+                  )}
+                </button>
 
-              <button
-                onClick={handleAIReview}
-                disabled={loading}
-                className={`mt-6 w-full py-3 text-white font-semibold rounded-xl transition duration-300 ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-[#0867bc] to-[#0d8df7] hover:opacity-90"
-                }`}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="animate-spin h-5 w-5" />
-                    Analyzing CV...
-                  </span>
-                ) : (
-                  "Start AI Free Review"
-                )}
-              </button>
+                <button
+                  onClick={() => {
+                    if (user?.isGoldMember) {
+                      // ✅ Gold member: allow access
+                      navigate("/professional-review");
+                    } else {
+                      // ❌ Not gold: show alert and redirect
+                      Swal.fire({
+                        icon: "warning",
+                        title: "Gold Membership Required",
+                        text: "This feature is exclusive to Gold Members. Upgrade to access professional CV review.",
+                        confirmButtonText: "View Plans",
+                        confirmButtonColor: "#0867bc",
+                        showCancelButton: true,
+                        cancelButtonText: "Cancel",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          navigate("/pricing-page");
+                        }
+                      });
+                    }
+                  }}
+                  className="mt-6 w-full py-3 whitespace-nowrap px-2 text-sm text-white font-semibold rounded-xl bg-gradient-to-r from-yellow-500 to-yellow-600 hover:opacity-90 transition duration-300"
+                >
+                  CV Review by Professionals
+                </button>
+              </div>
             </div>
           </div>
 
@@ -262,8 +294,6 @@ const CVReview = ({ user }) => {
               </div>
             </div>
           </section>
-
-          <CVFooter />
         </div>
       </div>
 
@@ -425,6 +455,8 @@ const CVReview = ({ user }) => {
           </div>
         </div>
       )}
+      <CVFooter />
+      <Footer />
     </>
   );
 };

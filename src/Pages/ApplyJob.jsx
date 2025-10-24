@@ -15,6 +15,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import FineSelect from "../context/FineSelect";
 import BASE_URL from "../config";
+import { useNavigate } from "react-router-dom";
 
 const ApplyJob = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const ApplyJob = () => {
   const [selectedResume, setSelectedResume] = useState("");
   const [coverLetter, setCoverLetter] = useState("");
   const [selectedResumeId, setSelectedResumeId] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (showModal) {
@@ -64,6 +66,24 @@ const ApplyJob = () => {
       return;
     }
 
+    // ✅ Check if job access is active
+    if (!user.isJobAccessActive) {
+      Swal.fire({
+        icon: "info",
+        title: "Access Restricted",
+        text: "Please activate your job access to apply for jobs.",
+        confirmButtonText: "Go to Pricing",
+        confirmButtonColor: "#0867bc",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/pricing-page");
+        }
+      });
+      return;
+    }
+
+    // ✅ If allowed, open modal
+
     try {
       const res = await axios.get(`${BASE_URL}/user/status/${user._id}`, {
         headers: {
@@ -93,7 +113,7 @@ const ApplyJob = () => {
       // If paid, allow the modal to open
       setShowModal(true);
     } catch (err) {
-      console.error("Error checking user payment:", err);
+      //console.error("Error checking user payment:", err);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -147,7 +167,7 @@ const ApplyJob = () => {
         });
       }
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       const msg =
         err.response?.data?.message ||
         (err.response?.status === 400

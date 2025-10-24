@@ -20,9 +20,11 @@ export const JobsContextProvider = (props) => {
   const fetchJobs = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/jobs/all`);
-      setJobs(res.data.jobs);
+      // Filter only active jobs
+      const activeJobs = res.data.jobs.filter((job) => job.status === "active");
+      setJobs(activeJobs);
     } catch (error) {
-      console.error("Error fetching jobs:", error);
+      //console.error("Error fetching jobs:", error);
     } finally {
       setLoading(false);
     }

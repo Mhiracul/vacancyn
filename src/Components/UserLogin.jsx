@@ -106,16 +106,23 @@ const UserLoginPage = () => {
         sessionStorage.setItem("user", JSON.stringify(user));
       }
 
+      // ⬇️ Replace this part inside handleLogin success block
       toast.success("✅ Login successful!");
       setUser(user);
 
-      // ⬇️ Add this redirect logic
       setTimeout(() => {
         setLoading(false);
-        if (isNewUser) {
-          navigate("/account-setup/user"); // 👈 redirect to user setup page
+
+        if (user.role === "admin") {
+          // redirect admin users
+          navigate("/admin");
         } else {
-          navigate("/dashboard");
+          // redirect normal users
+          if (isNewUser) {
+            navigate("/account-setup/user");
+          } else {
+            navigate("/dashboard");
+          }
         }
       }, 1500);
     } catch (err) {

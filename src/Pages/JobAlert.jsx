@@ -26,27 +26,221 @@ const JobAlert = () => {
     "Senior Level",
     "Executive Level",
   ];
+
   const industries = [
     "Accounting, Auditing & Finance",
-    "IT & Telecoms",
-    "Education",
-    "Banking, Insurance & Finance",
-    "Construction",
-    "Marketing & Communications",
-    "Manufacturing & Production",
-    "Healthcare & Pharmaceutical",
-    "NGO & Charity",
+    "Admin & Office",
+    "Advertising, Media & Communications",
+    "Agriculture, Fishing & Forestry",
+    "Banking, Insurance & Financial Services",
+    "Building & Architecture",
+    "Community & Social Services",
+    "Consulting & Strategy",
     "Creative & Design",
+    "Customer Service & Support",
+    "Education & Training",
+    "Engineering & Technology",
+    "Estate Agents & Property Management",
+    "Farming & Agriculture",
+    "Food Services & Catering",
+    "Health & Safety",
+    "Healthcare & Pharmaceutical",
+    "Hospitality & Leisure",
+    "Human Resources",
+    "Legal Services",
+    "Logistics & Transportation",
+    "Manufacturing & Production",
+    "Marketing & Communications",
+    "Mining, Energy & Metals",
+    "NGO, NPO & Charity",
+    "Oil & Gas",
+    "Product & Project Management",
+    "Public Sector & Government",
+    "Quality Control & Assurance",
+    "Real Estate & Property",
+    "Research, Teaching & Training",
+    "Retail, Fashion & FMCG",
+    "Sales",
+    "Science & Technology",
+    "Security & Defence",
+    "Supply Chain & Procurement",
+    "Telecommunications",
+    "Trades & Services",
+    "Travel, Tourism & Aviation",
   ];
+
   const jobRoles = [
-    "Software Developer",
-    "UI/UX Designer",
-    "Graphic Designer",
-    "Teacher",
-    "Project Manager",
+    // 💼 Accounting, Auditing & Finance
     "Accountant",
+    "Auditor",
+    "Finance Manager",
+    "Financial Analyst",
+    "Payroll Officer",
+    "Bookkeeper",
+    "Treasury Officer",
+
+    // 🏢 Admin & Office
+    "Administrative Assistant",
+    "Office Manager",
+    "Executive Assistant",
+    "Secretary",
+    "Receptionist",
+
+    // 🎨 Creative & Design
+    "Graphic Designer",
+    "UI/UX Designer",
+    "Animator",
+    "Video Editor",
+    "Creative Director",
+    "Content Creator",
+
+    // 🧱 Building & Architecture
+    "Architect",
+    "Civil Engineer",
+    "Quantity Surveyor",
+    "Construction Manager",
+    "Site Engineer",
+    "Structural Engineer",
+
+    // 💡 Consulting & Strategy
+    "Business Analyst",
+    "Management Consultant",
+    "Strategy Associate",
+    "Project Consultant",
+
+    // ☎️ Customer Service & Support
+    "Customer Support Representative",
+    "Call Center Agent",
+    "Client Relationship Officer",
+    "Technical Support Specialist",
+
+    // ⚙️ Engineering & Technology
+    "Software Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Full Stack Developer",
+    "DevOps Engineer",
+    "QA Engineer",
+    "Systems Engineer",
+    "Network Administrator",
+    "IT Support Specialist",
+
+    // 🌾 Farming & Agriculture
+    "Agricultural Officer",
+    "Farm Manager",
+    "Veterinary Technician",
+    "Crop Production Specialist",
+
+    // 🍽️ Food Services & Catering
+    "Chef",
+    "Cook",
+    "Waiter/Waitress",
+    "Caterer",
+    "Baker",
+    "Restaurant Manager",
+
+    // 🏨 Hospitality & Leisure
+    "Hotel Manager",
+    "Housekeeper",
+    "Front Desk Officer",
+    "Tour Guide",
+    "Event Planner",
+
+    // ⚖️ Legal Services
+    "Lawyer",
+    "Legal Assistant",
+    "Compliance Officer",
+    "Paralegal",
+
+    // 📢 Marketing & Communications
+    "Marketing Executive",
+    "Social Media Manager",
+    "Content Strategist",
+    "Public Relations Officer",
+    "Copywriter",
+    "SEO Specialist",
+
+    // 💊 Medical & Pharmaceutical
+    "Doctor",
+    "Nurse",
+    "Pharmacist",
+    "Medical Laboratory Scientist",
+    "Healthcare Assistant",
+    "Physiotherapist",
+
+    // 📦 Product & Project Management
+    "Product Manager",
+    "Project Manager",
+    "Scrum Master",
+    "Program Coordinator",
+
+    // 🏠 Estate Agents & Property Management
+    "Real Estate Agent",
+    "Property Manager",
+    "Facility Manager",
+    "Surveyor",
+
+    // ✅ Quality Control & Assurance
+    "Quality Assurance Officer",
+    "Quality Control Inspector",
+    "Production Supervisor",
+
+    // 👥 Human Resources
     "HR Officer",
-    "Customer Service Rep",
+    "HR Manager",
+    "Recruiter",
+    "Training Coordinator",
+
+    // 🧑‍💼 Management & Business Development
+    "Business Development Executive",
+    "Operations Manager",
+    "General Manager",
+    "CEO/Managing Director",
+
+    // 🤝 Community & Social Services
+    "Social Worker",
+    "NGO Program Officer",
+    "Community Development Officer",
+    "Counselor",
+
+    // 💰 Sales
+    "Sales Representative",
+    "Sales Manager",
+    "Business Sales Executive",
+    "Retail Sales Associate",
+
+    // 🚚 Supply Chain & Procurement
+    "Procurement Officer",
+    "Logistics Coordinator",
+    "Inventory Manager",
+    "Warehouse Supervisor",
+
+    // 🎓 Research, Teaching & Training
+    "Teacher",
+    "Lecturer",
+    "Trainer",
+    "Research Assistant",
+    "Education Consultant",
+
+    // 🔧 Trades & Services
+    "Electrician",
+    "Plumber",
+    "Mechanic",
+    "Carpenter",
+    "Welder",
+    "Technician",
+
+    // 🚗 Driver & Transport Services
+    "Driver",
+    "Dispatcher",
+    "Truck Driver",
+    "Delivery Rider",
+
+    // 🩺 Health & Safety
+    "Safety Officer",
+    "HSE Manager",
+    "Environmental Health Officer",
+    "Others",
   ];
 
   const handleChange = (field, value) => {
@@ -85,9 +279,10 @@ const JobAlert = () => {
       const res = await axios.get(`${BASE_URL}/job-alert/matches`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      //console.log("Fetched matching jobs response:", res.data); // 👈 ADD THIS
       setJobs(res.data.jobs || []);
     } catch (err) {
-      console.error("Error fetching jobs:", err);
+      //console.error("Error fetching jobs:", err);
     }
   };
 
@@ -197,7 +392,9 @@ const JobAlert = () => {
                   {job.jobType} | {job.experience}
                 </p>
                 <button
-                  onClick={() => (window.location.href = `/job/${job._id}`)}
+                  onClick={() =>
+                    (window.location.href = `/apply-job/${job._id}`)
+                  }
                   className="text-[#0867bc] text-sm font-medium hover:underline"
                 >
                   View Details →

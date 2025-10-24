@@ -94,7 +94,7 @@ const JobsByExperience = () => {
       const res = await axios.get(`${BASE_URL}/user/jobs/filter?${params}`);
       setJobs(res.data);
     } catch (err) {
-      console.error(err);
+      //console.error(err);
     } finally {
       setLoading(false);
     }

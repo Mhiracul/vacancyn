@@ -30,9 +30,9 @@ const RecruiterPayment = () => {
           }
         );
         if (res.data.paymentStatus === "paid") setPaid(true);
-        console.log("Token being sent:", localStorage.getItem("token"));
+        //console.log("Token being sent:", localStorage.getItem("token"));
       } catch (err) {
-        console.error("Payment status check failed:", err);
+        //console.error("Payment status check failed:", err);
       }
     };
 
@@ -61,19 +61,19 @@ const RecruiterPayment = () => {
         }
       );
 
-      console.log("Token being sent:", localStorage.getItem("token"));
+      //console.log("Token being sent:", localStorage.getItem("token"));
 
-      console.log("Paystack response:", res.data);
+      //console.log("Paystack response:", res.data);
 
       const { authorization_url } = res.data;
       if (!authorization_url) {
-        alert("Payment initialization failed. Check console for details.");
+        alert("Payment initialization failed. Check //console for details.");
         return;
       }
 
       window.location.href = authorization_url;
     } catch (error) {
-      console.error("Error initializing payment:", error);
+      //console.error("Error initializing payment:", error);
       alert("Unable to start payment. Try again later.");
     } finally {
       setLoading(false);

@@ -27,7 +27,7 @@ const CVHero = () => {
             Start Free Review
           </button>
           <a
-            href="/preview/1611a7a2-9f1a-4f85-9b99-6866b2521535/3389848/pricing"
+            href="/pricing-page"
             data-discover="true"
             className="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-[#0867bc] font-medium transition"
           >

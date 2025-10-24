@@ -58,9 +58,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Middle Section - Links */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
-          {/* Logo & About */}
+        {/* Middle Section - Logo & Contact */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img src={Logo} alt="Vacancy.NG logo" className="h-10" />
@@ -86,60 +85,6 @@ const Footer = () => {
                 <Linkedin size={18} />
               </a>
             </div>
-          </div>
-
-          {/* Job Seekers */}
-          <div>
-            <h4 className="font-semibold text-[#0A0A0A] mb-4">Job Seekers</h4>
-            <ul className="space-y-2 text-gray-600">
-              <li>
-                <Link to="/jobs" className="hover:text-[#0867bc]">
-                  Find Jobs
-                </Link>
-              </li>
-              <li>
-                <Link to="/upload-resume" className="hover:text-[#0867bc]">
-                  Upload Resume
-                </Link>
-              </li>
-              <li>
-                <Link to="/career-advice" className="hover:text-[#0867bc]">
-                  Career Advice
-                </Link>
-              </li>
-              <li>
-                <Link to="/job-alerts" className="hover:text-[#0867bc]">
-                  Job Alerts
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Employers */}
-          <div>
-            <h4 className="font-semibold text-[#0A0A0A] mb-4">Employers</h4>
-            <ul className="space-y-2 text-gray-600">
-              <li>
-                <Link to="/post-job" className="hover:text-[#0867bc]">
-                  Post a Job
-                </Link>
-              </li>
-              <li>
-                <Link to="/search-resumes" className="hover:text-[#0867bc]">
-                  Search Resumes
-                </Link>
-              </li>
-              <li>
-                <Link to="/employer-dashboard" className="hover:text-[#0867bc]">
-                  Employer Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link to="/recruitment-tips" className="hover:text-[#0867bc]">
-                  Recruitment Tips
-                </Link>
-              </li>
-            </ul>
           </div>
 
           {/* Contact */}

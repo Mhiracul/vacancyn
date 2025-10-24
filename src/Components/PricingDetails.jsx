@@ -1,7 +1,29 @@
-import React from "react";
-import { Check } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import BASE_URL from "../config";
 
 const PricingDetails = () => {
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/faqs`); // backend endpoint
+        if (res.data.success) {
+          setFaqs(res.data.faqs);
+        } else {
+          setFaqs([]);
+        }
+      } catch (error) {
+        // console.error("Error fetching FAQs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFaqs();
+  }, []);
   return (
     <div className="bg-white font-outfit">
       {/* Pricing Table */}
@@ -89,35 +111,27 @@ const PricingDetails = () => {
             Everything you need to know about our pricing plans
           </p>
 
-          <div className="space-y-6">
-            {[
-              {
-                q: "How does the expert CV review work?",
-                a: "Once you upgrade to the Gold plan, you can request an expert CV review. Our system will connect you directly to a professional recruiter via WhatsApp who will provide detailed feedback within 24–48 hours.",
-              },
-              {
-                q: "Can I cancel my subscription anytime?",
-                a: "Yes, you can cancel your subscription at any time. Your access to premium features will continue until the end of your current billing period.",
-              },
-              {
-                q: "What makes the Gold plan CV review special?",
-                a: "Unlike our free AI review, the Gold plan includes human expert analysis from professional recruiters who understand industry-specific requirements and can provide personalized career advice.",
-              },
-              {
-                q: "Is there a free trial for Gold plan?",
-                a: "We offer a 7-day free trial for the Gold plan. You can access all premium features including expert CV review during this period.",
-              },
-              {
-                q: "How quickly will I get my CV reviewed?",
-                a: "AI reviews are instant. Expert reviews (Gold plan) are typically completed within 24–48 hours via WhatsApp consultation.",
-              },
-            ].map((faq, i) => (
-              <div key={i} className="bg-white rounded-lg p-6 shadow-sm ">
-                <h3 className="font-semibold text-gray-800 mb-2">{faq.q}</h3>
-                <p className="text-gray-600 leading-relaxed">{faq.a}</p>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <p className="text-center text-gray-500">Loading FAQs...</p>
+          ) : faqs.length > 0 ? (
+            <div className="space-y-6">
+              {faqs.map((faq) => (
+                <div
+                  key={faq._id}
+                  className="bg-white rounded-lg p-6 shadow-sm"
+                >
+                  <h3 className="font-semibold text-gray-800 mb-2">
+                    {faq.question}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">
+              No FAQs have been added yet.
+            </p>
+          )}
         </div>
       </section>
 
@@ -133,10 +147,10 @@ const PricingDetails = () => {
 
         <div className="flex flex-col md:flex-row items-center justify-center gap-4">
           <button className="bg-white text-[#0867bc] font-medium px-6 py-3 rounded-lg hover:bg-gray-100 transition">
-            Start Free Trial
+            <a href="/cv-review">Start Free Trial</a>
           </button>
           <button className="bg-[#0867bc] hover:bg-[#023868] px-6 py-3 rounded-lg font-medium text-white transition">
-            Try CV Review
+            <a href="/cv-review">Try CV Review</a>
           </button>
         </div>
       </section>

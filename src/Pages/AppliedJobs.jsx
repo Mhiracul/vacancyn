@@ -17,7 +17,7 @@ const AppliedJobs = () => {
         });
         setAppliedJobs(res.data || []);
       } catch (error) {
-        console.error("Error fetching applied jobs:", error);
+        //console.error("Error fetching applied jobs:", error);
       } finally {
         setLoading(false);
       }

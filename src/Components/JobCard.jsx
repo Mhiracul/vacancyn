@@ -42,11 +42,11 @@ const JobCard = ({ job, onToast }) => {
     }
 
     if (!_token || !user) {
-      console.log("JobCard.requireLogin -> not logged in");
+      //console.log("JobCard.requireLogin -> not logged in");
       notify("Please log in to continue.", "error");
       return false;
     }
-    console.log("JobCard.requireLogin -> logged in");
+    //console.log("JobCard.requireLogin -> logged in");
     return true;
   };
 
@@ -62,7 +62,7 @@ const JobCard = ({ job, onToast }) => {
         const isFav = favorites.some((fav) => fav._id === job._id);
         setIsFavorite(isFav);
       } catch (err) {
-        console.error("JobCard: error fetching favorites", err);
+        //console.error("JobCard: error fetching favorites", err);
       }
     };
     fetchFavorites();
@@ -91,7 +91,7 @@ const JobCard = ({ job, onToast }) => {
         res.data.favorite ? "success" : "error"
       );
     } catch (err) {
-      console.error("JobCard: error toggling favorite", err);
+      //console.error("JobCard: error toggling favorite", err);
       notify("Something went wrong. Please try again.", "error");
     }
   };

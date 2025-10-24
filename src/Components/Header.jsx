@@ -1,6 +1,6 @@
 import React, { useState, useContext, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, UserPlus, User } from "lucide-react";
+import { Menu, X, UserPlus, User, Search } from "lucide-react";
 import Logo from "../assets/Logoo.svg";
 import { JobsContext } from "../context/jobContext";
 import axios from "axios";
@@ -28,10 +28,8 @@ function Header() {
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
-  // Logout handler
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
-
     try {
       await axios.post(
         `${BASE_URL}/auth/logout`,
@@ -39,29 +37,24 @@ function Header() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
     } catch (err) {
-      console.warn("Backend logout failed:", err.response?.data || err.message);
+      //console.warn("Backend logout failed:", err.response?.data || err.message);
     } finally {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       setUser(null);
       toast.success("Logged out successfully!");
-      navigate("/home"); // redirect to homepage
+      navigate("/home");
     }
   };
 
-  // Inside Header component, replace navLinks definition with:
+  // ✅ Simplify recruiter links (Dashboard only)
   const navLinks = user
     ? user.role === "recruiter"
-      ? [
-          { path: "/dashboard", label: "Dashboard" },
-          { path: "/dashboard/view-applications", label: "Applications" },
-          { path: "/dashboard/manage-job", label: "My Jobs" },
-          { path: "/browse-candidates", label: "Find Candidates" },
-        ]
+      ? [{ path: "/dashboard", label: "Dashboard" }]
       : [
+          { path: "/", label: "Home" },
           { path: "/findwork", label: "Find Work" },
           { path: "/dashboard", label: "Dashboard" },
-          { path: "/dashboard/jobs-for-you", label: "Job Alert" },
           {
             path: "/browse-recruiters",
             label: "Find Employers",
@@ -82,38 +75,26 @@ function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <ul className="hidden md:flex text-base items-center gap-3 md:gap-6">
-          {navLinks.map(({ path, label, disabled }) => (
+        <ul className="hidden md:flex text-base items-center gap-6">
+          {navLinks.map(({ path, label }) => (
             <li key={path}>
-              {disabled ? (
-                <button
-                  className="py-2 px-4 lg:px-6 md:text-base text-sm rounded-md text-gray-400 cursor-not-allowed"
-                  onClick={() =>
-                    toast.error(
-                      "You need to be a Gold Member to access this page."
-                    )
-                  }
-                >
-                  {label}
-                </button>
-              ) : (
-                <Link
-                  to={path}
-                  className={`py-2 px-4 lg:px-6 md:text-base text-sm rounded-md transition-all duration-200 ${
-                    pathname === path
-                      ? "text-[#7263F3] border-[#7263F3] border bg-[#7263F3]/10"
-                      : "hover:text-[#7263F3]"
-                  }`}
-                >
-                  {label}
-                </Link>
-              )}
+              <Link
+                to={path}
+                className={`py-2 px-4 rounded-md transition-all duration-200 ${
+                  pathname === path ? "text-[#0867bc] " : "hover:text-[#0867bc]"
+                }`}
+              >
+                {label}
+              </Link>
             </li>
           ))}
         </ul>
 
-        {/* Desktop Right Section */}
-        <div className="hidden md:flex items-center gap-4 relative">
+        {/* Right section (username + Find Candidates) */}
+        <div className="hidden md:flex items-center gap-6 relative">
+          {/* ✅ Find Candidates link (only for recruiter) */}
+
+          {/* User dropdown */}
           {user ? (
             <div
               className="relative"
@@ -157,7 +138,7 @@ function Header() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu */}
         <button
           onClick={toggleMenu}
           className="md:hidden text-[#0867bc] focus:outline-none"
@@ -166,7 +147,7 @@ function Header() {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
+      {/* ✅ Mobile Menu */}
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-white shadow-md md:hidden">
           <ul className="flex flex-col items-center py-4 gap-4">
@@ -177,14 +158,30 @@ function Header() {
                   onClick={() => setMenuOpen(false)}
                   className={`block py-2 px-6 rounded-md ${
                     pathname === path
-                      ? "text-[#7263F3] border-[#7263F3] border bg-[#7263F3]/10"
-                      : "text-gray-700 hover:text-[#7263F3]"
+                      ? "text-[#0867bc] border-b-2 border-[#0867bc]"
+                      : "text-gray-700 hover:text-[#0867bc]"
                   }`}
                 >
                   {label}
                 </Link>
               </li>
             ))}
+
+            {/* ✅ Add Find Candidates in mobile view too */}
+            {user?.role === "recruiter" && (
+              <li>
+                <button
+                  onClick={() => {
+                    navigate("/browse-candidates");
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 bg-[#0867bc] text-white px-6 py-2 rounded-full hover:bg-[#075a9c]"
+                >
+                  <Search className="w-4 h-4" />
+                  Find Candidates
+                </button>
+              </li>
+            )}
 
             <div className="flex flex-col gap-3 mt-4">
               {user ? (
@@ -198,13 +195,13 @@ function Header() {
                 <>
                   <button
                     onClick={() => navigate("/recruiter-login")}
-                    className="py-2 px-6 text-base cursor-pointer text-gray-600 transition-all"
+                    className="py-2 px-6 text-base text-gray-600"
                   >
                     Recruiter Login
                   </button>
                   <button
                     onClick={() => navigate("/login")}
-                    className="py-2 px-6 text-base rounded-full cursor-pointer bg-[#0867bc] flex items-center justify-center gap-2 text-white hover:bg-[#065ba3] transition-all"
+                    className="py-2 inline-flex items-center justify-center px-4 gap-1 text-base rounded-full bg-[#0867bc] text-white hover:bg-[#065ba3]"
                   >
                     <UserPlus className="w-4 h-4" />
                     Login

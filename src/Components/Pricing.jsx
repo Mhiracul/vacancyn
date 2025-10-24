@@ -82,10 +82,7 @@ const Pricing = () => {
       }
     } catch (error) {
       toast.dismiss();
-      console.error(
-        "Payment initialization failed:",
-        error.response?.data || error.message
-      );
+      //console.error("Payment initialization failed:",error.response?.data || error.message);
       toast.error("Unable to initialize payment");
     }
   };

@@ -50,7 +50,7 @@ const ExperienceFilterPage = () => {
         const res = await axios.get(`${BASE_URL}/user/jobs/experience-count`);
         setCounts(res.data);
       } catch (error) {
-        console.error("Error fetching experience counts:", error);
+        //console.error("Error fetching experience counts:", error);
       } finally {
         setLoading(false);
       }

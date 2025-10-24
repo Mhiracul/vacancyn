@@ -14,6 +14,7 @@ import {
   LogOut,
   LayoutDashboard,
   Menu,
+  Search,
   X,
 } from "lucide-react";
 import { JobsContext } from "../context/jobContext";
@@ -55,15 +56,15 @@ const Dashboard = () => {
 
           // 👇 Optional: handle redirects based on role
           if (parsedUser.role === "recruiter") {
-            console.log("Recruiter logged in");
+            //console.log("Recruiter logged in");
             // navigate("/dashboard/manage-job"); // recruiter dashboard
           } else {
-            console.log("User logged in");
+            //console.log("User logged in");
             // navigate("/dashboard"); // regular user dashboard
           }
         }
       } catch (err) {
-        console.error("Invalid token:", err);
+        //console.error("Invalid token:", err);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         navigate("/login");
@@ -76,26 +77,30 @@ const Dashboard = () => {
 
   const menuItems = {
     recruiter: [
-      { label: "Dashboard", path: "/dashboard", icon: "/src/assets/Fill.svg" },
+      {
+        label: "Dashboard",
+        path: "/dashboard",
+        icon: <LayoutDashboard strokeWidth={2} className="w-6 h-6" />,
+      },
       {
         label: "Add Job",
         path: "/dashboard/add-job",
-        icon: "/src/assets/AddJ.svg",
+        icon: <BellRing strokeWidth={2} className="w-6 h-6" />,
       },
       {
         label: "Manage Jobs",
         path: "/dashboard/manage-job",
-        icon: "/src/assets/ManageJ.svg",
+        icon: <BellRing strokeWidth={2} className="w-6 h-6" />,
       },
       {
         label: "View Applications",
         path: "/dashboard/view-applications",
-        icon: "/src/assets/viewApp.svg",
+        icon: <BriefcaseBusiness strokeWidth={2} className="w-6 h-6" />,
       },
       {
         label: "Settings",
         path: "/dashboard/settings",
-        icon: <Settings strokeWidth={2} className="w-5 h-5" />,
+        icon: <Settings strokeWidth={2} className="w-6 h-6" />,
       },
     ],
     user: [
@@ -119,11 +124,7 @@ const Dashboard = () => {
         path: "/dashboard/favorite-jobs",
         icon: <Bookmark strokeWidth={2} className="w-6 h-6" />,
       },
-      {
-        label: "Payment & Billing",
-        path: "/dashboard/billing-plans",
-        icon: <Bookmark strokeWidth={2} className="w-6 h-6" />,
-      },
+
       {
         label: "Settings",
         path: "/dashboard/user-settings",
@@ -165,7 +166,7 @@ const Dashboard = () => {
         }
       );
     } catch (err) {
-      console.warn(err);
+      //console.warn(err);
     } finally {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
@@ -195,6 +196,17 @@ const Dashboard = () => {
 
           {/* Right Section - Profile + Mobile Menu */}
           <div className="flex items-center gap-3">
+            {/* ✅ Show Find Candidates only for recruiters */}
+            {user?.role === "recruiter" && (
+              <button
+                onClick={() => navigate("/browse-candidates")}
+                className="flex items-center gap-2  text-black rounded-full underline transition-all"
+              >
+                <span className="md:text-sm text-xs">Find Candidates</span>
+              </button>
+            )}
+
+            {/* Username */}
             <p className="max-sm:hidden capitalize">{user?.firstName}</p>
 
             {/* Profile Dropdown */}
@@ -202,7 +214,7 @@ const Dashboard = () => {
               <img
                 src={user?.profileImage || Google}
                 alt="Profile"
-                className="w-8 h-8 border border-[#e2e2e2] rounded-full cursor-pointer object-cover"
+                className="md:w-8 md:h-8 w-0 h-0 border md:block hidden border-[#e2e2e2] rounded-full cursor-pointer object-cover"
               />
               <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
                 <ul className="list-none m-0 p-2 bg-white rounded-md border border-[#e2e2e2] text-sm">
@@ -216,7 +228,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Mobile Menu Button (Now on the far right) */}
+            {/* Mobile Menu Button */}
             <button
               className="lg:hidden ml-2"
               onClick={() => setMenuOpen(true)}

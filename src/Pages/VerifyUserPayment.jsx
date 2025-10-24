@@ -45,7 +45,7 @@ const VerifyUserPayment = () => {
           setMessage("Payment not successful. Please try again.");
         }
       } catch (err) {
-        console.error("Payment verification failed:", err);
+        //console.error("Payment verification failed:", err);
         setStatus("failed");
         setMessage("Payment verification failed. Please contact support.");
       } finally {

@@ -69,7 +69,7 @@ const UserSettings = () => {
 
       toast.success("Profile picture updated!");
     } catch (err) {
-      console.error("❌ Error uploading profile image:", err);
+      //console.error("❌ Error uploading profile image:", err);
       toast.error("Failed to upload image");
     }
   };
@@ -91,7 +91,7 @@ const UserSettings = () => {
         toast.error(res.data.message || "Failed to delete resume");
       }
     } catch (err) {
-      console.error("❌ Error deleting resume:", err);
+      //console.error("❌ Error deleting resume:", err);
       toast.error("Error deleting resume");
     }
   };
@@ -102,7 +102,7 @@ const UserSettings = () => {
         const res = await axios.get(`${BASE_URL}/auth/settings`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("📄 User settings fetched:", res.data);
+        //console.log("📄 User settings fetched:", res.data);
         const user = res.data;
         setUserData(user);
 
@@ -113,7 +113,7 @@ const UserSettings = () => {
         ];
         setResumes(combinedResumes);
       } catch (err) {
-        console.error("Error fetching settings:", err);
+        //console.error("Error fetching settings:", err);
         toast.error("Failed to load settings");
       }
     };
@@ -158,7 +158,7 @@ const UserSettings = () => {
         });
       }
     } catch (err) {
-      console.error("❌ Resume upload error:", err);
+      //console.error("❌ Resume upload error:", err);
       toast.error(
         err.response?.data?.message || "Something went wrong while uploading!",
         { position: "top-right", autoClose: 3000 }
@@ -175,7 +175,7 @@ const UserSettings = () => {
       toast.success("Settings updated successfully!");
       setUserData(res.data.user);
     } catch (error) {
-      console.error("❌ Error saving settings:", error);
+      //console.error("❌ Error saving settings:", error);
       toast.error("Failed to update settings");
     }
   };

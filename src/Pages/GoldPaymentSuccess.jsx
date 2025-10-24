@@ -52,7 +52,7 @@ const GoldPaymentSuccess = () => {
       }
     } catch (err) {
       Swal.close();
-      console.error("Verification error:", err);
+      //console.error("Verification error:", err);
       Swal.fire({
         icon: "error",
         title: "Something went wrong!",

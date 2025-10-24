@@ -21,12 +21,16 @@ const AddJob = () => {
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
+  const [jobs, setJobs] = useState([]);
+  const [editingJob, setEditingJob] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const jobTypes = [
     "Full Time",
     "Part Time",
     "Internship & Graduate",
     "Contract",
+    "Remote",
   ];
   const experiences = [
     "No Experience",
@@ -318,7 +322,7 @@ const AddJob = () => {
           localStorage.setItem("user", JSON.stringify(userData));
         } else setIsPaid(false);
       } catch (err) {
-        console.error("Payment status error:", err);
+        //console.error("Payment status error:", err);
       } finally {
         setLoading(false);
       }
@@ -397,6 +401,23 @@ const AddJob = () => {
       setPosting(false);
     }
   };
+
+  const fetchJobs = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/jobs/my-jobs`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) setJobs(data.jobs);
+    } catch (error) {
+      //console.error("Error fetching jobs:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
   // Loader
   if (loading)
@@ -612,6 +633,124 @@ const AddJob = () => {
           </button>
         </div>
       </form>
+
+      {/* Recruiter Jobs List */}
+      {jobs.length > 0 && (
+        <div className="mt-10 bg-white shadow-sm rounded-2xl border border-gray-200 p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">
+            Your Posted Jobs
+          </h3>
+
+          <div className="space-y-4">
+            {jobs.map((job) => (
+              <div
+                key={job._id}
+                className="flex items-center justify-between border-b border-gray-100 pb-3"
+              >
+                <div>
+                  <h4 className="font-medium text-gray-800">{job.title}</h4>
+                  <p className="text-sm text-gray-500">{job.location}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setEditingJob(job);
+                    setShowEditModal(true);
+                  }}
+                  className="text-sm bg-[#0867bc] text-white px-4 py-2 rounded-md hover:bg-[#065a9b]"
+                >
+                  Edit
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showEditModal && editingJob && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-white w-full max-w-2xl p-6 rounded-2xl shadow-lg my-10 mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">
+              Edit Job - {editingJob.title}
+            </h3>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={editingJob.title}
+                onChange={(e) =>
+                  setEditingJob({ ...editingJob, title: e.target.value })
+                }
+                className="w-full px-4 py-2 border rounded-md border-gray-300"
+                placeholder="Job Title"
+              />
+
+              <input
+                type="text"
+                value={editingJob.location}
+                onChange={(e) =>
+                  setEditingJob({ ...editingJob, location: e.target.value })
+                }
+                className="w-full px-4 py-2 border rounded-md border-gray-300"
+                placeholder="Location"
+              />
+
+              <ReactQuill
+                theme="snow"
+                value={editingJob.description}
+                onChange={(value) =>
+                  setEditingJob({ ...editingJob, description: value })
+                }
+                className="bg-white border border-gray-300 rounded-lg"
+              />
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  const token = localStorage.getItem("token");
+                  const res = await fetch(
+                    `${BASE_URL}/jobs/update/${editingJob._id}`,
+                    {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify(editingJob),
+                    }
+                  );
+                  const data = await res.json();
+                  if (res.ok) {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Job Updated!",
+                      showConfirmButton: false,
+                      timer: 2000,
+                    });
+                    setShowEditModal(false);
+                    fetchJobs(); // refresh list
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Update Failed",
+                      text: data.message || "Something went wrong.",
+                    });
+                  }
+                }}
+                className="px-4 py-2 bg-[#0867bc] text-white rounded-md hover:bg-[#065a9b]"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

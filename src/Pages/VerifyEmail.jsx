@@ -33,7 +33,7 @@ const VerifyEmail = () => {
         // Close this verification page/modal
       }, 1000);
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      //console.error(err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Verification failed");
       setLoading(false);
     }

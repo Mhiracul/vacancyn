@@ -15,6 +15,7 @@ import { JobsContext } from "../context/jobContext";
 import Money from "../assets/money.svg";
 import moment from "moment";
 import BASE_URL from "../config";
+import Swal from "sweetalert2";
 
 const FavoriteJobs = () => {
   const [favorites, setFavorites] = useState([]);
@@ -55,7 +56,7 @@ const FavoriteJobs = () => {
         results.forEach((r) => (appliedStatusMap[r.id] = r.applied));
         setAppliedJobs(appliedStatusMap);
       } catch (error) {
-        console.error("Error fetching favorite jobs:", error);
+        //console.error("Error fetching favorite jobs:", error);
         toast.error("Failed to load favorite jobs.");
       } finally {
         setLoading(false);
@@ -83,7 +84,7 @@ const FavoriteJobs = () => {
         toast.success("Job added to favorites!");
       }
     } catch (error) {
-      console.error("Error removing favorite job:", error);
+      //console.error("Error removing favorite job:", error);
       toast.error("Something went wrong. Please try again.");
     }
   };
@@ -119,7 +120,7 @@ const FavoriteJobs = () => {
         toast.error(res.data.message || "Something went wrong");
       }
     } catch (err) {
-      console.error("❌ Apply job error:", err);
+      //console.error("❌ Apply job error:", err);
       const errorMessage =
         err.response?.data?.message ||
         (err.response?.status === 400
@@ -306,7 +307,18 @@ const FavoriteJobs = () => {
             {/* Apply Button */}
             <div className="mt-6 flex justify-end">
               <button
-                onClick={() => handleApply(selectedJob._id)}
+                onClick={() => {
+                  if (!user?.isJobAccessActive) {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Access Restricted",
+                      text: "You need an active Job Access plan to apply for jobs. Please upgrade your plan to continue.",
+                      confirmButtonColor: "#0867bc",
+                    });
+                    return;
+                  }
+                  handleApply(selectedJob._id);
+                }}
                 disabled={applying}
                 className="bg-[#0867bc] hover:bg-[#075a9c] text-white px-6 py-2 rounded-md font-medium transition disabled:opacity-50"
               >

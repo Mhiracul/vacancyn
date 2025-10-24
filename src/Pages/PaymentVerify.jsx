@@ -48,7 +48,7 @@ const PaymentVerify = () => {
           setTimeout(() => navigate("/pricing"), 3000);
         }
       } catch (err) {
-        console.error(err);
+        //console.error(err);
         setStatus("failed");
         toast.error("Payment verification failed");
         setTimeout(() => navigate("/pricing"), 3000);

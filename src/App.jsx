@@ -52,6 +52,7 @@ import Pricing from "./Components/Pricing.jsx";
 import ScrollToTop from "./Components/ScrollToTop.jsx";
 import UserAccountSetup from "./Pages/UserAccountSetup.jsx";
 import ResetPassword from "./Pages/ResetPassword.jsx";
+import AdminProtectedRoute from "./context/AdminProtectedRoute.jsx";
 
 function AppContent() {
   const userData = localStorage.getItem("user");
@@ -90,7 +91,14 @@ function AppContent() {
         <Route path="/payment/success" element={<GoldPaymentSuccess />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/cv-review" element={<CVReview />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard />
+            </AdminProtectedRoute>
+          }
+        />{" "}
         <Route path="/dashboard" element={<Dashboard />}>
           {/* Default dashboard outlet per role */}
           <Route

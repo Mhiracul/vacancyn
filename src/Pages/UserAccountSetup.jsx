@@ -29,6 +29,7 @@ import {
 import { JobsContext } from "../context/jobContext";
 import FineSelect from "../context/FineSelect";
 import BASE_URL from "../config";
+import { useNavigate } from "react-router-dom";
 
 const UserAccountSetup = () => {
   const [userData, setUserData] = useState({});
@@ -47,6 +48,7 @@ const UserAccountSetup = () => {
     level: "Beginner",
   });
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!userData || Object.keys(userData).length === 0) return;
@@ -88,7 +90,7 @@ const UserAccountSetup = () => {
 
       toast.success("Profile picture updated!");
     } catch (err) {
-      console.error("❌ Error uploading profile image:", err);
+      //console.error("❌ Error uploading profile image:", err);
       toast.error("Failed to upload image");
     }
   };
@@ -110,7 +112,7 @@ const UserAccountSetup = () => {
         toast.error(res.data.message || "Failed to delete resume");
       }
     } catch (err) {
-      console.error("❌ Error deleting resume:", err);
+      //console.error("❌ Error deleting resume:", err);
       toast.error("Error deleting resume");
     }
   };
@@ -121,7 +123,7 @@ const UserAccountSetup = () => {
         const res = await axios.get(`${BASE_URL}/auth/settings`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("📄 User settings fetched:", res.data);
+        //console.log("📄 User settings fetched:", res.data);
         const user = res.data;
         setUserData(user);
 
@@ -132,7 +134,7 @@ const UserAccountSetup = () => {
         ];
         setResumes(combinedResumes);
       } catch (err) {
-        console.error("Error fetching settings:", err);
+        //console.error("Error fetching settings:", err);
         toast.error("Failed to load settings");
       }
     };
@@ -177,7 +179,7 @@ const UserAccountSetup = () => {
         });
       }
     } catch (err) {
-      console.error("❌ Resume upload error:", err);
+      //console.error("❌ Resume upload error:", err);
       toast.error(
         err.response?.data?.message || "Something went wrong while uploading!",
         { position: "top-right", autoClose: 3000 }
@@ -194,8 +196,38 @@ const UserAccountSetup = () => {
       toast.success("Settings updated successfully!");
       setUserData(res.data.user);
     } catch (error) {
-      console.error("❌ Error saving settings:", error);
+      // console.error("❌ Error saving settings:", error);
       toast.error("Failed to update settings");
+    }
+  };
+
+  const handleNextStep = async () => {
+    const tabs = ["personal", "profile", "social", "account"]; // all your tabs
+    const currentIndex = tabs.indexOf(activeTab);
+
+    try {
+      await handleSaveChanges(); // save on every step
+
+      if (currentIndex < tabs.length - 1) {
+        // go to next tab
+        setActiveTab(tabs[currentIndex + 1]);
+      } else {
+        // last tab → finish setup
+        Swal.fire({
+          icon: "success",
+          title: "Setup Complete!",
+          text: "Welcome to your dashboard.",
+          confirmButtonColor: "#0867bc",
+        }).then(() => navigate("/dashboard"));
+      }
+    } catch (error) {
+      //console.error("Error saving step:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong!",
+        text: "Please try again.",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -219,21 +251,21 @@ const UserAccountSetup = () => {
   };
 
   const handleAddSkill = async () => {
-    console.log("Add skill clicked ✅");
+    //console.log("Add skill clicked ✅");
 
     try {
       const res = await axios.post(`${BASE_URL}/auth/skills`, newSkill, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Response:", res.data);
+      //console.log("Response:", res.data);
       Swal.fire({
         icon: "success",
         title: "Skill added!",
         text: `"${newSkill.name}" added successfully.`,
       });
     } catch (err) {
-      console.error("Error adding skill:", err);
+      // console.error("Error adding skill:", err);
     }
   };
 
@@ -355,10 +387,10 @@ const UserAccountSetup = () => {
 
               <div className="mt-6">
                 <button
-                  onClick={handleSaveChanges}
+                  onClick={handleNextStep}
                   className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
                 >
-                  Save Changes
+                  {activeTab === "account" ? "Finish Setup" : "Next"}
                 </button>
               </div>
 
@@ -430,14 +462,12 @@ const UserAccountSetup = () => {
                   <input
                     value={userData.dob ? userData.dob.split("T")[0] : ""}
                     type="date"
-                    readOnly
                     className="pl-10 border border-gray-300 placeholder:text-sm text-sm rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   />
                 </div>
                 <select
                   className="border border-gray-300 rounded-lg placeholder:text-sm text-sm p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   value={userData.gender || ""}
-                  readOnly
                 >
                   <option>Gender</option>
                   <option>Male</option>
@@ -481,8 +511,12 @@ const UserAccountSetup = () => {
                 <textarea
                   rows="4"
                   placeholder="Write your biography..."
+                  value={userData.bio || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, bio: e.target.value })
+                  }
                   className="col-span-2 border border-gray-300 placeholder:text-sm text-sm rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                ></textarea>
+                />
 
                 {/* Skills Section */}
                 <div className="col-span-2 mt-6">
@@ -612,10 +646,10 @@ const UserAccountSetup = () => {
 
               <div className="mt-6">
                 <button
-                  onClick={handleSaveChanges}
+                  onClick={handleNextStep}
                   className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
                 >
-                  Save Changes
+                  {activeTab === "account" ? "Finish Setup" : "Next"}
                 </button>
               </div>
             </div>
@@ -777,10 +811,10 @@ const UserAccountSetup = () => {
               {/* Save Changes */}
               <div className="mt-6">
                 <button
-                  onClick={handleSaveChanges}
+                  onClick={handleNextStep}
                   className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
                 >
-                  Save Changes
+                  {activeTab === "account" ? "Finish Setup" : "Next"}
                 </button>
               </div>
             </div>
@@ -866,10 +900,10 @@ const UserAccountSetup = () => {
 
               <div className="mt-6">
                 <button
-                  onClick={handleSaveChanges}
-                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-[#1870be]"
+                  onClick={handleNextStep}
+                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
                 >
-                  Save Changes
+                  {activeTab === "account" ? "Finish Setup" : "Next"}
                 </button>
               </div>
             </div>

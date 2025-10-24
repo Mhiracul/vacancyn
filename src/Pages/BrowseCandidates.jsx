@@ -14,6 +14,7 @@ const BrowseCandidates = () => {
     gender: "All",
     location: "",
     search: "",
+    skills: "",
   });
 
   useEffect(() => {
@@ -21,9 +22,9 @@ const BrowseCandidates = () => {
   }, [filters]);
 
   const fetchCandidates = async () => {
-    const { gender, location, search } = filters;
+    const { gender, location, search, skills } = filters;
     const res = await axios.get(`${BASE_URL}/candidates`, {
-      params: { gender, location, search },
+      params: { gender, location, search, skills },
     });
 
     const data = res.data.data || [];
@@ -34,7 +35,7 @@ const BrowseCandidates = () => {
       if (!a.isGoldMember && b.isGoldMember) return 1;
       return 0;
     });
-    console.log("Fetched candidates:", res.data.data);
+    //console.log("Fetched candidates:", res.data.data);
 
     setCandidates(sorted);
   };
@@ -119,6 +120,23 @@ const BrowseCandidates = () => {
                 </label>
               ))}
             </div>
+
+            {/* Skills Filter */}
+            <h4 className="text-gray-600 mb-2 mt-4">Skills</h4>
+            <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2">
+              <input
+                type="text"
+                placeholder="e.g. React, UI/UX, Python"
+                value={filters.skills}
+                onChange={(e) =>
+                  setFilters({ ...filters, skills: e.target.value })
+                }
+                className="flex-1 outline-none text-gray-700 text-sm"
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Separate multiple skills with commas
+            </p>
           </div>
 
           {/* Candidate List */}
@@ -132,7 +150,7 @@ const BrowseCandidates = () => {
                 {candidates.map((c) => (
                   <div
                     key={c._id}
-                    className="flex justify-between items-center bg-white p-4 hover:border-[#78b7ed] rounded-md border border-gray-200  hover:shadow-md transition"
+                    className="flex flex-col md:flex-row justify-between md:items-center bg-white p-4 hover:border-[#78b7ed] rounded-md border border-gray-200 hover:shadow-md transition"
                   >
                     <div className="flex items-center gap-4">
                       <img
@@ -141,24 +159,34 @@ const BrowseCandidates = () => {
                         className="w-14 h-14 rounded-md shadow object-cover"
                       />
                       <div>
-                        <h4 className="font-semibold text-[#212934] flex items-center gap-2">
+                        <h4 className="font-semibold whitespace-nowrap text-[#212934] flex items-center gap-2">
                           {c.firstName} {c.lastName}
                           {c.isGoldMember && (
-                            <span className="text-blue-600   text-xs font-medium px-2 py-[2px] ">
+                            <span className="text-blue-600 text-xs font-medium px-2 py-[2px]">
                               ✅
                             </span>
                           )}
                         </h4>
 
                         <p className="text-gray-600 text-sm">{c.profession}</p>
-                        <p className="text-gray-500 text-xs">
+                        <p className="text-gray-500 text-xs mb-3 md:mb-0">
                           {c.location} • {c.experience} experience
                         </p>
+
+                        {/* 👇 On mobile, the button appears below */}
+                        <button
+                          onClick={() => setSelectedCandidate(c)}
+                          className="md:hidden bg-[#e7f1fd] text-[#0867bc] font-medium px-4 py-2 rounded hover:bg-blue-100 w-fit"
+                        >
+                          View Profile
+                        </button>
                       </div>
                     </div>
+
+                    {/* 👇 On desktop, the button stays to the right */}
                     <button
                       onClick={() => setSelectedCandidate(c)}
-                      className="bg-[#e7f1fd] text-[#0867bc] font-medium px-4 py-2 hover:bg-blue-100"
+                      className="hidden md:block bg-[#e7f1fd] text-[#0867bc] font-medium px-4 py-2 rounded hover:bg-blue-100"
                     >
                       View Profile
                     </button>
