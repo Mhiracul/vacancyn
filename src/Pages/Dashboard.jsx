@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Logo from "../assets/Logoo.svg";
 import Google from "../assets/googlelogo.png";
 import { jwtDecode } from "jwt-decode";
+import { Home } from "lucide-react";
 
 import {
   BriefcaseBusiness,
@@ -207,7 +208,20 @@ const Dashboard = () => {
             )}
 
             {/* Username */}
-            <p className="max-sm:hidden capitalize">{user?.firstName}</p>
+            {/* Username + Home Button */}
+            <div className="flex items-center gap-3">
+              <p className="max-sm:hidden capitalize">{user?.firstName}</p>
+              <button
+                onClick={() => {
+                  navigate("/home");
+                  window.scrollTo(0, 0);
+                }}
+                className="flex items-center gap-1 text-[#0867bc] border border-[#0867bc]/30 hover:bg-[#0867bc]/10 px-3 py-1.5 rounded-full transition-all"
+              >
+                <Home className="w-4 h-4" />
+                <span className="text-sm font-medium">Home</span>
+              </button>
+            </div>
 
             {/* Profile Dropdown */}
             <div className="relative group">

@@ -61,12 +61,6 @@ const HowItWorks = () => {
               {step.title}
             </h3>
             <p className="text-gray-500 text-sm">{step.desc}</p>
-
-            {step.id === 3 && (
-              <button className="mt-6 bg-[#0867bc] text-white px-5 py-2 rounded-md hover:bg-[#065a9c] transition">
-                Start Searching
-              </button>
-            )}
           </div>
         ))}
       </div>

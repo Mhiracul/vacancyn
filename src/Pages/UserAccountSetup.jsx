@@ -42,11 +42,8 @@ const UserAccountSetup = () => {
   const { fetchUserProfile, setUser } = useContext(JobsContext);
   const [progress, setProgress] = useState(0);
   const [showSkillForm, setShowSkillForm] = useState(false);
-  const [newSkill, setNewSkill] = useState({
-    name: "",
-    category: "",
-    level: "Beginner",
-  });
+  const [newSkill, setNewSkill] = useState("");
+
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -106,13 +103,12 @@ const UserAccountSetup = () => {
 
       if (res.data.success) {
         toast.success("Resume deleted successfully!");
-        setResumes(res.data.resumes); // update UI
-        await fetchUserProfile(); // refresh context
+        setResumes(res.data.resumes);
+        await fetchUserProfile();
       } else {
         toast.error(res.data.message || "Failed to delete resume");
       }
     } catch (err) {
-      //console.error("❌ Error deleting resume:", err);
       toast.error("Error deleting resume");
     }
   };
@@ -123,18 +119,13 @@ const UserAccountSetup = () => {
         const res = await axios.get(`${BASE_URL}/auth/settings`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        //console.log("📄 User settings fetched:", res.data);
+
         const user = res.data;
         setUserData(user);
 
-        // Combine old and new resumes
-        const combinedResumes = [
-          ...(user.resumes || []),
-          ...(user.resume ? [{ url: user.resume, name: "Resume.pdf" }] : []),
-        ];
-        setResumes(combinedResumes);
+        // ✅ Use only the 'resumes' array
+        setResumes(user.resumes || []);
       } catch (err) {
-        //console.error("Error fetching settings:", err);
         toast.error("Failed to load settings");
       }
     };
@@ -163,16 +154,22 @@ const UserAccountSetup = () => {
       });
 
       if (res.data.success) {
-        // ✅ Update user context with new resumes
-        setUser((prev) => ({
-          ...prev,
-          resumes: res.data.resumes,
-        }));
         toast.success("✅ Resume uploaded successfully!", {
           position: "top-right",
           autoClose: 3000,
         });
-        await fetchUserProfile();
+
+        // ✅ Update local resumes instantly so UI refreshes immediately
+        setResumes(res.data.resumes);
+
+        // Also keep your user context in sync
+        setUser((prev) => ({
+          ...prev,
+          resumes: res.data.resumes,
+        }));
+
+        // Optional: refresh profile in the background (not blocking UI)
+        fetchUserProfile();
       } else {
         toast.error(res.data.message || "Upload failed!", {
           position: "top-right",
@@ -251,21 +248,36 @@ const UserAccountSetup = () => {
   };
 
   const handleAddSkill = async () => {
-    //console.log("Add skill clicked ✅");
+    if (!newSkill.trim()) {
+      return toast.error("Job Skill is required");
+    }
 
     try {
-      const res = await axios.post(`${BASE_URL}/auth/skills`, newSkill, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.post(
+        `${BASE_URL}/auth/skills`,
+        { name: newSkill }, // ✅ Only 'name' is sent
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      //console.log("Response:", res.data);
+      setUserData((prev) => ({
+        ...prev,
+        skills: res.data.skills,
+      }));
+
       Swal.fire({
         icon: "success",
         title: "Skill added!",
-        text: `"${newSkill.name}" added successfully.`,
+        text: `"${newSkill}" added successfully.`,
       });
+
+      setNewSkill("");
     } catch (err) {
-      // console.error("Error adding skill:", err);
+      console.error("Error adding skill:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.response?.data?.message || "Failed to add skill",
+      });
     }
   };
 
@@ -378,20 +390,14 @@ const UserAccountSetup = () => {
                     <input
                       type="url"
                       value={userData.website || ""}
-                      placeholder="Website URL"
+                      onChange={(e) =>
+                        setUserData({ ...userData, website: e.target.value })
+                      }
+                      placeholder="Website/Porfolio"
                       className="pl-10 border border-gray-300 placeholder:text-sm text-sm rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className="mt-6">
-                <button
-                  onClick={handleNextStep}
-                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
-                >
-                  {activeTab === "account" ? "Finish Setup" : "Next"}
-                </button>
               </div>
 
               {/* Resume Section */}
@@ -411,7 +417,6 @@ const UserAccountSetup = () => {
                           <p className="font-medium text-gray-800">
                             {resume.name}
                           </p>
-                          <p className="text-xs text-gray-500">{resume.size}</p>
                         </div>
                         <div className="relative group">
                           <MoreVertical className="w-4 h-4 text-gray-500 cursor-pointer" />
@@ -447,6 +452,14 @@ const UserAccountSetup = () => {
                   </label>
                 </div>
               </div>
+              <div className="mt-6">
+                <button
+                  onClick={handleNextStep}
+                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-[#0a78d8]"
+                >
+                  {activeTab === "account" ? "Finish Setup" : "Next"}
+                </button>
+              </div>
             </div>
           )}
 
@@ -461,6 +474,9 @@ const UserAccountSetup = () => {
                   <Calendar className="absolute left-3 top-3.5 text-gray-400" />
                   <input
                     value={userData.dob ? userData.dob.split("T")[0] : ""}
+                    onChange={(e) =>
+                      setUserData({ ...userData, dob: e.target.value })
+                    }
                     type="date"
                     className="pl-10 border border-gray-300 placeholder:text-sm text-sm rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   />
@@ -468,6 +484,9 @@ const UserAccountSetup = () => {
                 <select
                   className="border border-gray-300 rounded-lg placeholder:text-sm text-sm p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   value={userData.gender || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, gender: e.target.value })
+                  }
                 >
                   <option>Gender</option>
                   <option>Male</option>
@@ -482,14 +501,17 @@ const UserAccountSetup = () => {
                   }
                   placeholder="Select education level"
                   options={[
-                    "High School / Secondary",
-                    "Diploma / OND",
-                    "Bachelor's Degree",
-                    "Master's Degree",
-                    "Doctorate / PhD",
-                    "Professional Certification",
-                    "Vocational Training",
-                    "Other",
+                    "Degree",
+                    "Diploma",
+                    "High School (S.S.C.E)",
+                    "HND",
+                    "MBA / MSc",
+                    "MBBS",
+                    "MPhil / PhD",
+                    "N.C.E",
+                    "OND",
+                    "Others",
+                    "Vocational",
                   ]}
                 />
                 <FineSelect
@@ -500,17 +522,33 @@ const UserAccountSetup = () => {
                   }
                   placeholder="Select years of experience"
                   options={[
-                    "Less than 1 year",
-                    "1 - 2 years",
-                    "3 - 5 years",
-                    "6 - 10 years",
-                    "11 - 15 years",
-                    "Above 15 years",
+                    "No Experience/Less than 1 year",
+                    "1 year",
+                    "2 years",
+                    "3 years",
+                    "4 years",
+                    "5 years",
+                    "6 years",
+                    "7 years",
+                    "8 years",
+                    "9 years",
+                    "10 years",
+                    "11 years",
+                    "12 years",
+                    "13 years",
+                    "14 years",
+                    "15 years",
+                    "16 years",
+                    "17 years",
+                    "18 years",
+                    "19 years",
+                    "20 years",
+                    "More than 20 years",
                   ]}
                 />
                 <textarea
                   rows="4"
-                  placeholder="Write your biography..."
+                  placeholder="Tell us about Yourself..."
                   value={userData.bio || ""}
                   onChange={(e) =>
                     setUserData({ ...userData, bio: e.target.value })
@@ -522,132 +560,96 @@ const UserAccountSetup = () => {
                 <div className="col-span-2 mt-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-gray-800">
-                      Skills
+                      Job Skills
                     </h3>
-                    <button
-                      type="button"
-                      onClick={() => setShowSkillForm(true)}
-                      className="px-4 py-2 bg-[#0867bc] text-white rounded-md hover:bg-blue-700 text-sm flex items-center gap-1"
-                    >
-                      <PlusCircle size={16} /> Add Skill
-                    </button>
                   </div>
 
-                  {/* Existing Skills List */}
-                  {userData.skills && userData.skills.length > 0 ? (
-                    <div className="grid md:grid-cols-2 gap-3 mb-4">
-                      {userData.skills.map((skill, index) => (
+                  <p className="text-sm text-gray-500 mb-3">
+                    What are your areas of expertise?
+                  </p>
+
+                  {/* Existing Skills as Pills */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {userData.skills && userData.skills.length > 0 ? (
+                      userData.skills.map((skill, index) => (
                         <div
                           key={index}
-                          className="flex justify-between items-center border border-gray-200 bg-gray-50 p-3 rounded-lg"
+                          className="flex items-center bg-[#2d3448] text-white px-3 py-1.5 rounded-full text-sm"
                         >
-                          <div>
-                            <p className="font-medium text-gray-800">
-                              {skill.name}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {skill.category} • {skill.level}
-                            </p>
-                          </div>
+                          <span>{skill.name || skill}</span>
                           <button
-                            onClick={() => {
-                              const updated = userData.skills.filter(
-                                (_, i) => i !== index
-                              );
-                              setUserData({ ...userData, skills: updated });
+                            onClick={async () => {
+                              try {
+                                const res = await axios.post(
+                                  `${BASE_URL}/auth/delete-skill`,
+                                  { skillName: skill.name || skill },
+                                  {
+                                    headers: {
+                                      Authorization: `Bearer ${token}`,
+                                    },
+                                  }
+                                );
+
+                                setUserData((prev) => ({
+                                  ...prev,
+                                  skills: res.data.skills,
+                                }));
+
+                                toast.success(
+                                  `"${
+                                    skill.name || skill
+                                  }" removed successfully`
+                                );
+                              } catch (err) {
+                                console.error("Error deleting skill:", err);
+                                toast.error(
+                                  err.response?.data?.message ||
+                                    "Failed to delete skill"
+                                );
+                              }
                             }}
-                            className="text-red-500 hover:text-red-700"
+                            className="ml-2 text-white hover:text-gray-300"
                           >
                             ✕
                           </button>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm mb-4">
-                      No skills added yet.
-                    </p>
-                  )}
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-sm mb-4">
+                        No skills added yet.
+                      </p>
+                    )}
+                  </div>
 
-                  {/* Add Skill Form */}
-                  <div className="grid md:grid-cols-3 items-center gap-4 mb-2">
+                  {/* Add Skill Input */}
+                  <div className="flex flex-col sm:flex-row gap-3 items-center">
                     <input
                       type="text"
-                      placeholder="Skill name"
-                      value={newSkill.name}
-                      onChange={(e) =>
-                        setNewSkill({ ...newSkill, name: e.target.value })
-                      }
-                      className="border border-gray-300 rounded-lg placeholder:text-sm text-sm px-3 py-2.5 focus:outline-none"
-                      style={{ height: "42px" }}
+                      placeholder="Skill"
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#0867bc] focus:outline-none"
                     />
-
-                    <FineSelect
-                      label="Category"
-                      value={newSkill.category}
-                      onChange={(val) =>
-                        setNewSkill({ ...newSkill, category: val })
-                      }
-                      placeholder="Select category"
-                      options={[
-                        "Technical",
-                        "Programming",
-                        "Data Science",
-                        "AI / Machine Learning",
-                        "Web Development",
-                        "Mobile Development",
-                        "Cloud Computing",
-                        "DevOps",
-                        "Cybersecurity",
-                        "Networking",
-                        "Database Management",
-                        "UI/UX Design",
-                        "Graphic Design",
-                        "Digital Marketing",
-                        "Content Creation",
-                        "Writing & Editing",
-                        "Project Management",
-                        "Finance / Accounting",
-                        "Human Resources",
-                        "Sales",
-                        "Customer Service",
-                        "Leadership",
-                        "Communication",
-                        "Language",
-                        "Soft Skill",
-                        "Creative",
-                        "Other",
-                      ]}
-                    />
-
-                    <FineSelect
-                      label="Skill Level"
-                      value={newSkill.level}
-                      onChange={(val) =>
-                        setNewSkill({ ...newSkill, level: val })
-                      }
-                      placeholder="Select level"
-                      options={[
-                        "Beginner",
-                        "Intermediate",
-                        "Advanced",
-                        "Expert",
-                      ]}
-                    />
+                    <button
+                      onClick={handleAddSkill}
+                      className="whitespace-nowrap px-5 py-2 border border-[#0867bc] text-[#0867bc] hover:bg-[#0a78d8] hover:text-white rounded-md text-sm font-medium transition-all"
+                    >
+                      Add Job Skill
+                    </button>
                   </div>
-                  <button
-                    onClick={handleAddSkill}
-                    className="px-4 py-2 bg-[#0867bc] text-white rounded-md hover:bg-blue-700 text-sm flex items-center gap-1"
-                  >
-                    Add Skill
-                  </button>
+
+                  {/* Optional validation message */}
+                  {!userData.skills?.length && (
+                    <p className="text-red-500 text-sm mt-2">
+                      Job Skill is required
+                    </p>
+                  )}
                 </div>
               </div>
-
               <div className="mt-6">
                 <button
                   onClick={handleNextStep}
-                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
+                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-[#0a78d8]"
                 >
                   {activeTab === "account" ? "Finish Setup" : "Next"}
                 </button>
@@ -812,7 +814,7 @@ const UserAccountSetup = () => {
               <div className="mt-6">
                 <button
                   onClick={handleNextStep}
-                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
+                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-[#0a78d8]"
                 >
                   {activeTab === "account" ? "Finish Setup" : "Next"}
                 </button>
@@ -901,7 +903,7 @@ const UserAccountSetup = () => {
               <div className="mt-6">
                 <button
                   onClick={handleNextStep}
-                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-blue-700"
+                  className="px-5 py-3 bg-[#0867bc] text-white rounded-md hover:bg-[#0a78d8]"
                 >
                   {activeTab === "account" ? "Finish Setup" : "Next"}
                 </button>

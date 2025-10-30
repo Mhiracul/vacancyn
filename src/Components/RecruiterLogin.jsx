@@ -202,7 +202,7 @@ const RecruiterLogin = () => {
           {/* Left: Form */}
           <div className="w-full container mx-auto px-10 md:w-1/2 mt-10 p-8">
             <h1 className="text-2xl font-bold text-start text-neutral-800 mb-2">
-              Recruiter {state}
+              Employer {state}
             </h1>
 
             <p className="text-sm text-gray-500 text-start mb-3">
@@ -273,19 +273,6 @@ const RecruiterLogin = () => {
                 >
                   Forgot Password?
                 </p>
-
-                <div className="flex justify-between mt-8 items-center">
-                  <div className="w-[40%] h-0.5 bg-[#e2e2e2]"></div>
-                  <h2 className="text-[#e2e2e2] text-sm">OR</h2>
-                  <div className="w-[40%] h-0.5 bg-[#e2e2e2]"></div>
-                </div>
-
-                <button className="flex items-center bg-white justify-center gap-2 shadow-lg mt-8 rounded-lg py-3 w-full mb-4 hover:bg-gray-100">
-                  <img src={GoogleLogo} alt="Google" className="h-8" />
-                  <span className="text-sm text-gray-700">
-                    Login with Google
-                  </span>
-                </button>
               </form>
             )}
 

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { JobsContext } from "../context/jobContext";
 import Logo from "../assets/Logoo.svg";
 import { ArrowRight } from "lucide-react";
+import BASE_URL from "../config";
 const VerifyEmail = () => {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);

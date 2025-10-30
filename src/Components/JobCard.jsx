@@ -103,12 +103,49 @@ const JobCard = ({ job, onToast }) => {
 
     if (!token || !user) {
       notify("Please log in to apply for jobs.", "error");
+      setTimeout(() => {
+        navigate("/login");
+        window.scrollTo(0, 0);
+      }, 1500); // wait for toast to show
       return;
     }
+
     if (!user.isJobAccessActive) {
-      notify("You need to unlock Job Application Access to apply.", "error");
+      Swal.fire({
+        title: "Job Access Required",
+        text: "You need to pay a one-time fee to unlock Job Application Access to apply for jobs.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#0867bc",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: "Unlock Access",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/pricing-page");
+          window.scrollTo(0, 0);
+
+          // highlight "Job Application Access" plan
+          setTimeout(() => {
+            const jobAccessBox = document.querySelector(
+              '[data-plan="Job Application Access"]'
+            );
+            if (jobAccessBox) {
+              jobAccessBox.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+              jobAccessBox.classList.add("ring-4", "ring-[#0867bc]");
+              setTimeout(() => {
+                jobAccessBox.classList.remove("ring-4", "ring-[#0867bc]");
+              }, 3000);
+            }
+          }, 800);
+        }
+      });
       return;
     }
+
     navigate(`/apply-job/${job._id}`);
     window.scrollTo(0, 0);
   };
@@ -196,12 +233,6 @@ const JobCard = ({ job, onToast }) => {
           className="bg-[#0867bc] hover:bg-[#075a9c] text-white font-medium rounded px-4 py-2 transition-all"
         >
           Apply Now
-        </button>
-        <button
-          onClick={handleApply}
-          className="text-gray-600 border border-gray-400 hover:bg-gray-100 px-4 py-2 rounded transition-all"
-        >
-          Learn More
         </button>
       </div>
     </div>

@@ -89,16 +89,18 @@ const ManageJobs = () => {
             const isExpired = expiration < now;
 
             // Determine display status
-            const displayStatus = isExpired ? "expired" : job.status;
+            let displayStatus = "";
+            if (job.status === "pending") displayStatus = "Under Review";
+            else if (job.status === "active") displayStatus = "Published";
+            else displayStatus = "Expired"; // for expired or other statuses
 
             // Choose color style based on status
             const statusColor =
-              displayStatus === "active"
+              displayStatus === "Published"
                 ? "bg-green-100 text-green-700"
-                : displayStatus === "pending"
+                : displayStatus === "Under Review"
                 ? "bg-yellow-100 text-yellow-700"
                 : "bg-red-100 text-red-700"; // expired
-
             return (
               <div
                 key={job._id}

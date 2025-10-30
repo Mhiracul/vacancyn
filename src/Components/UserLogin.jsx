@@ -93,6 +93,7 @@ const UserLoginPage = () => {
       const res = await axios.post(`${BASE_URL}/auth/login`, {
         email,
         password,
+        rememberMe,
       });
 
       const { token, user } = res.data;
@@ -121,7 +122,7 @@ const UserLoginPage = () => {
           if (isNewUser) {
             navigate("/account-setup/user");
           } else {
-            navigate("/dashboard");
+            navigate("/");
           }
         }
       }, 1500);
@@ -239,17 +240,6 @@ const UserLoginPage = () => {
                   Forgot Password?
                 </span>
               </div>
-
-              <div className="flex justify-between mt-8 items-center">
-                <div className="w-[40%] h-0.5 bg-gray-300"></div>
-                <h2 className="text-gray-400 text-sm">OR</h2>
-                <div className="w-[40%] h-0.5 bg-gray-300"></div>
-              </div>
-
-              <button className="flex items-center bg-white justify-center gap-2 shadow-md mt-6 rounded-lg py-3 w-full hover:bg-gray-50">
-                <img src={GoogleLogo} alt="Google" className="h-6" />
-                <span className="text-sm text-gray-700">Login with Google</span>
-              </button>
             </>
           ) : (
             <form

@@ -230,7 +230,10 @@ const AdminDashboard = () => {
               <div>
                 <p className="text-sm text-red-600 font-medium">Expired Jobs</p>
                 <h2 className="text-2xl font-bold text-red-900">
-                  {jobs.filter((j) => j.status === "expired").length}
+                  {
+                    jobs.filter((j) => new Date(j.expirationDate) < new Date())
+                      .length
+                  }
                 </h2>
               </div>
             </div>
@@ -623,9 +626,7 @@ const AdminDashboard = () => {
                   <h3 className="font-semibold text-gray-900 mb-1">
                     Subscription & Payment
                   </h3>
-                  <p className="text-sm text-gray-700">
-                    <strong>Plan:</strong> {selectedRecruiter.plan || "Free"}
-                  </p>
+
                   <p className="text-sm text-gray-700">
                     <strong>Payment Status:</strong>{" "}
                     <span
@@ -664,58 +665,133 @@ const AdminDashboard = () => {
 
         {selectedUser && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative overflow-y-auto max-h-[90vh]">
+            <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[90vh]">
               <button
                 onClick={() => setSelectedUser(null)}
-                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-lg font-bold"
               >
                 ✕
               </button>
 
-              <h2 className="text-xl font-bold mb-2 text-gray-900">
+              {/* Personal Info */}
+              <h2 className="text-2xl font-bold mb-1 text-gray-900">
                 {selectedUser.firstName} {selectedUser.lastName}
               </h2>
-              <p className="text-sm text-gray-600 mb-4">{selectedUser.email}</p>
+              <p className="text-sm text-gray-600 mb-2">{selectedUser.email}</p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {selectedUser.isGoldMember && (
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">
+                    Gold Member
+                  </span>
+                )}
+                {selectedUser.isJobAccessActive && (
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold">
+                    JobAccess Member
+                  </span>
+                )}
+              </div>
 
-              <p className="text-sm text-gray-800 mb-2">
-                <strong>Profession:</strong> {selectedUser.profession || "—"}
-              </p>
-              <p className="text-sm text-gray-800 mb-2">
-                <strong>Experience:</strong> {selectedUser.experience || "—"}
-              </p>
-              <p className="text-sm text-gray-800 mb-2">
-                <strong>Applications:</strong>{" "}
-                {selectedUser.applications?.length || 0}
-              </p>
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-800 mb-4">
+                <p>
+                  <strong>Bio:</strong> {selectedUser.bio || "—"}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {selectedUser.phone || "—"}
+                </p>
+                <p>
+                  <strong>DOB:</strong>{" "}
+                  {selectedUser.dob
+                    ? new Date(selectedUser.dob).toLocaleDateString()
+                    : "—"}
+                </p>
+                <p>
+                  <strong>Gender:</strong> {selectedUser.gender || "—"}
+                </p>
+                <p>
+                  <strong>Profession:</strong> {selectedUser.profession || "—"}
+                </p>
+                <p>
+                  <strong>Experience:</strong> {selectedUser.experience || "—"}
+                </p>
+              </div>
 
-              <p className="text-sm text-gray-800 mb-2">
-                <strong>Plan:</strong>{" "}
-                {(() => {
-                  const hasGold =
-                    selectedUser.plans?.includes("Gold Tag Membership") ||
-                    selectedUser.plan === "Gold Tag Membership";
-                  const hasJobAccess =
-                    selectedUser.plans?.includes("Job Application Access") ||
-                    selectedUser.plan === "Job Application Access";
-                  if (hasGold && hasJobAccess) return "Gold + Job Access";
-                  if (hasGold) return "Gold";
-                  if (hasJobAccess) return "Job Access";
-                  return "Free";
-                })()}
-              </p>
+              {/* Applications */}
 
-              <p className="text-sm text-gray-800 mb-2">
-                <strong>Payment Status:</strong>{" "}
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                    selectedUser.paymentStatus === "paid"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {selectedUser.paymentStatus || "Pending"}
-                </span>
-              </p>
+              {/* Skills */}
+              {selectedUser.skills?.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">Skills</h3>
+                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                    {selectedUser.skills.map((skill, i) => (
+                      <li key={i}>
+                        {skill.name} {skill.level ? `(${skill.level})` : ""}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Resume / CV */}
+              {selectedUser.resumes?.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Resume / CV
+                  </h3>
+                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                    {selectedUser.resumes.map((resume, index) => (
+                      <li key={index}>
+                        <a
+                          href={`https://app.assuchglobal.com${resume.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          {resume.name}
+                        </a>{" "}
+                        <span className="text-gray-500 text-xs">
+                          (Uploaded:{" "}
+                          {new Date(resume.uploadedAt).toLocaleDateString()})
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Membership & Payment */}
+              <div className="mt-4">
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  Membership & Payment
+                </h3>
+                <p className="text-sm text-gray-800 mb-1">
+                  <strong>Plan:</strong>{" "}
+                  {selectedUser.isGoldMember && selectedUser.isJobAccessActive
+                    ? "Gold + Job Access"
+                    : selectedUser.isGoldMember
+                    ? "Gold Member"
+                    : selectedUser.isJobAccessActive
+                    ? "JobAccess Member"
+                    : "Free"}
+                </p>
+              </div>
+
+              {/* KYC / Verification */}
+              {selectedUser.kycApproved !== undefined && (
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    KYC Status
+                  </h3>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      selectedUser.kycApproved
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {selectedUser.kycApproved ? "Approved" : "Pending"}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -736,12 +812,7 @@ const AdminDashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Industry
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Plan
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Payment Status
-                    </th>
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Job Posts
                     </th>
@@ -764,29 +835,16 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {r.company?.industry || "—"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {r.plan || "Free"}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            r.paymentStatus === "paid"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {r.paymentStatus || "unpaid"}
-                        </span>
-                      </td>
+
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {r.jobPosts?.length || 0}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        <button className="text-blue-600 hover:text-blue-800 mr-3">
+                        <button
+                          onClick={() => setSelectedRecruiter(r)}
+                          className="text-blue-600 hover:text-blue-800 mr-3"
+                        >
                           View
-                        </button>
-                        <button className="text-red-600 hover:text-red-800">
-                          Delete
                         </button>
                       </td>
                     </tr>
@@ -811,23 +869,11 @@ const AdminDashboard = () => {
                   <p className="text-sm text-gray-700">
                     <strong>Industry:</strong> {r.company?.industry || "—"}
                   </p>
-                  <p className="text-sm">
-                    <strong>Plan:</strong> {r.plan || "Free"}
-                  </p>
+
                   <p className="text-sm">
                     <strong>Jobs:</strong> {r.jobPosts?.length || 0}
                   </p>
-                  <p className="text-sm mt-1">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        r.paymentStatus === "paid"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {r.paymentStatus || "unpaid"}
-                    </span>
-                  </p>
+
                   <div className="flex gap-3 mt-3 text-sm">
                     <button
                       onClick={() => setSelectedRecruiter(r)}
@@ -862,15 +908,6 @@ const AdminDashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Experience
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Plan
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Payment Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Applications
-                    </th>
 
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Actions
@@ -890,37 +927,6 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {u.experience || "—"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {(() => {
-                          const hasGold =
-                            u.plans?.includes("Gold Tag Membership") ||
-                            u.plan === "Gold Tag Membership";
-                          const hasJobAccess =
-                            u.plans?.includes("Job Application Access") ||
-                            u.plan === "Job Application Access";
-
-                          if (hasGold && hasJobAccess)
-                            return "Gold + Job Access";
-                          if (hasGold) return "Gold";
-                          if (hasJobAccess) return "Job Access";
-                          return "Free";
-                        })()}
-                      </td>
-
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            u.paymentStatus === "paid"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {u.paymentStatus || "Pending"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {u.applications?.length || 0}
                       </td>
 
                       <td className="px-6 py-4 text-sm text-gray-900">
@@ -953,24 +959,7 @@ const AdminDashboard = () => {
                   <p className="text-sm">
                     <strong>Experience:</strong> {u.experience || "—"}
                   </p>
-                  <p className="text-sm">
-                    <strong>Applications:</strong> {u.applications?.length || 0}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Plan:</strong>{" "}
-                    {(() => {
-                      const hasGold =
-                        u.plans?.includes("Gold Tag Membership") ||
-                        u.plan === "Gold Tag Membership";
-                      const hasJobAccess =
-                        u.plans?.includes("Job Application Access") ||
-                        u.plan === "Job Application Access";
-                      if (hasGold && hasJobAccess) return "Gold + Job Access";
-                      if (hasGold) return "Gold";
-                      if (hasJobAccess) return "Job Access";
-                      return "Free";
-                    })()}
-                  </p>
+
                   <div className="flex items-center gap-2 mt-2">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${

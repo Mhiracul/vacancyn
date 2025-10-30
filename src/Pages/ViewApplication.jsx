@@ -279,15 +279,22 @@ const ViewApplication = () => {
                 }}
               />
 
-              {selectedApp.resume ? (
-                <a
-                  href={selectedApp.resume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md font-medium inline-block"
-                >
-                  Download Resume
-                </a>
+              {selectedApp.user?.resumes &&
+              selectedApp.user?.resumes.length > 0 ? (
+                <ul className=" text-sm text-gray-700 space-y-1">
+                  {selectedApp.user?.resumes.map((resume, index) => (
+                    <li key={index}>
+                      <a
+                        href={`https://app.assuchglobal.com${resume.url}`} // adjust BASE_URL if needed
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md font-medium inline-block"
+                      >
+                        Download Resume
+                      </a>{" "}
+                    </li>
+                  ))}
+                </ul>
               ) : (
                 <p className="text-gray-500">No resume uploaded</p>
               )}

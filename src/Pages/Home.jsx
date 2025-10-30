@@ -5,16 +5,16 @@ import JobListing from "../Components/JobListing";
 import TrustedBy from "../Components/TrustedBy";
 import HowItWorks from "../Components/HowItWorks";
 import Footer from "../Components/Footer";
-import ExperienceFilterPage from "./ExperienceFilterPage";
 import Pricing from "../Components/Pricing";
 import CVFooter from "../Components/CVFooter";
+import IndustryFilterPage from "./IndustryFilterPage";
 
 const Home = () => {
   return (
     <div className="font-outfit ">
       <Header />
       <Hero />
-      <ExperienceFilterPage />
+      <IndustryFilterPage />
 
       <JobListing showPagination={false} maxJobs={6} />
       <HowItWorks />

@@ -43,7 +43,6 @@ import JobAlert from "./Pages/JobAlert.jsx";
 import About from "./Pages/About.jsx";
 import TermsAndConditions from "./Pages/TermsCondition.jsx";
 import UserTypeSelection from "./Pages/UserTypeSelection.jsx";
-import JobsByExperience from "./Pages/JobsByExperience.jsx";
 import BillingPage from "./Pages/BillingPage.jsx";
 import GoldPaymentSuccess from "./Pages/GoldPaymentSuccess.jsx";
 import AdminDashboard from "./Pages/Admin/AdminDashboard.jsx";
@@ -53,6 +52,7 @@ import ScrollToTop from "./Components/ScrollToTop.jsx";
 import UserAccountSetup from "./Pages/UserAccountSetup.jsx";
 import ResetPassword from "./Pages/ResetPassword.jsx";
 import AdminProtectedRoute from "./context/AdminProtectedRoute.jsx";
+import JobsByIndustry from "./Pages/JobsByIndustry.jsx";
 
 function AppContent() {
   const userData = localStorage.getItem("user");
@@ -84,7 +84,7 @@ function AppContent() {
         <Route path="/payment/verify-user" element={<VerifyUserPayment />} />
         <Route path="/browse-candidates" element={<BrowseCandidates />} />
         <Route path="/browse-recruiters" element={<BrowseRecruiters />} />
-        <Route path="/jobs/experience/:level" element={<JobsByExperience />} />
+        <Route path="/jobs/industry/:industry" element={<JobsByIndustry />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/pricing-page" element={<Pricing />} />

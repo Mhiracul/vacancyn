@@ -37,6 +37,7 @@ const UserSettings = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { fetchUserProfile, setUser } = useContext(JobsContext);
+  const [newSkill, setNewSkill] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -102,18 +103,13 @@ const UserSettings = () => {
         const res = await axios.get(`${BASE_URL}/auth/settings`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        //console.log("📄 User settings fetched:", res.data);
+
         const user = res.data;
         setUserData(user);
 
-        // Combine old and new resumes
-        const combinedResumes = [
-          ...(user.resumes || []),
-          ...(user.resume ? [{ url: user.resume, name: "Resume.pdf" }] : []),
-        ];
-        setResumes(combinedResumes);
+        // ✅ Use only the 'resumes' array
+        setResumes(user.resumes || []);
       } catch (err) {
-        //console.error("Error fetching settings:", err);
         toast.error("Failed to load settings");
       }
     };
@@ -142,16 +138,22 @@ const UserSettings = () => {
       });
 
       if (res.data.success) {
-        // ✅ Update user context with new resumes
-        setUser((prev) => ({
-          ...prev,
-          resumes: res.data.resumes,
-        }));
         toast.success("✅ Resume uploaded successfully!", {
           position: "top-right",
           autoClose: 3000,
         });
-        await fetchUserProfile();
+
+        // ✅ Update local resumes instantly so UI refreshes immediately
+        setResumes(res.data.resumes);
+
+        // Also keep your user context in sync
+        setUser((prev) => ({
+          ...prev,
+          resumes: res.data.resumes,
+        }));
+
+        // Optional: refresh profile in the background (not blocking UI)
+        fetchUserProfile();
       } else {
         toast.error(res.data.message || "Upload failed!", {
           position: "top-right",
@@ -196,6 +198,40 @@ const UserSettings = () => {
       setConfirmPassword("");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update password");
+    }
+  };
+
+  const handleAddSkill = async () => {
+    if (!newSkill.trim()) {
+      return toast.error("Job Skill is required");
+    }
+
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/auth/skills`,
+        { name: newSkill }, // ✅ Only 'name' is sent
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setUserData((prev) => ({
+        ...prev,
+        skills: res.data.skills,
+      }));
+
+      Swal.fire({
+        icon: "success",
+        title: "Skill added!",
+        text: `"${newSkill}" added successfully.`,
+      });
+
+      setNewSkill("");
+    } catch (err) {
+      console.error("Error adding skill:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.response?.data?.message || "Failed to add skill",
+      });
     }
   };
 
@@ -284,7 +320,10 @@ const UserSettings = () => {
                 <input
                   type="url"
                   value={userData.website || ""}
-                  placeholder="Website URL"
+                  onChange={(e) =>
+                    setUserData({ ...userData, website: e.target.value })
+                  }
+                  placeholder="Website/Porfolio"
                   className="pl-10 border border-gray-300 placeholder:text-sm text-sm rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
@@ -315,7 +354,6 @@ const UserSettings = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium text-gray-800">{resume.name}</p>
-                      <p className="text-xs text-gray-500">{resume.size}</p>
                     </div>
                     <div className="relative group">
                       <MoreVertical className="w-4 h-4 text-gray-500 cursor-pointer" />
@@ -386,14 +424,17 @@ const UserSettings = () => {
               onChange={(val) => setUserData({ ...userData, education: val })}
               placeholder="Select education level"
               options={[
-                "High School / Secondary",
-                "Diploma / OND",
-                "Bachelor's Degree",
-                "Master's Degree",
-                "Doctorate / PhD",
-                "Professional Certification",
-                "Vocational Training",
-                "Other",
+                "Degree",
+                "Diploma",
+                "High School (S.S.C.E)",
+                "HND",
+                "MBA / MSc",
+                "MBBS",
+                "MPhil / PhD",
+                "N.C.E",
+                "OND",
+                "Others",
+                "Vocational",
               ]}
             />
             <FineSelect
@@ -402,19 +443,127 @@ const UserSettings = () => {
               onChange={(val) => setUserData({ ...userData, experience: val })}
               placeholder="Select years of experience"
               options={[
-                "Less than 1 year",
-                "1 - 2 years",
-                "3 - 5 years",
-                "6 - 10 years",
-                "11 - 15 years",
-                "Above 15 years",
+                "No Experience/Less than 1 year",
+                "1 year",
+                "2 years",
+                "3 years",
+                "4 years",
+                "5 years",
+                "6 years",
+                "7 years",
+                "8 years",
+                "9 years",
+                "10 years",
+                "11 years",
+                "12 years",
+                "13 years",
+                "14 years",
+                "15 years",
+                "16 years",
+                "17 years",
+                "18 years",
+                "19 years",
+                "20 years",
+                "More than 20 years",
               ]}
             />
             <textarea
               rows="4"
-              placeholder="Write your biography..."
-              className="col-span-2 border border-gray-300 placeholder:text-sm text-sm rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            ></textarea>
+              placeholder="Tell us about Yourself..."
+              value={userData.bio || ""}
+              onChange={(e) =>
+                setUserData({ ...userData, bio: e.target.value })
+              }
+              className="col-span-2 border border-gray-300 placeholder:text-sm placeholder:font-normal font-normal text-sm rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            />
+
+            {/* Skills Section */}
+            <div className="col-span-2 mt-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Job Skills
+                </h3>
+              </div>
+
+              <p className="text-sm text-gray-500 mb-3">
+                What are your areas of expertise?
+              </p>
+
+              {/* Existing Skills as Pills */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {userData.skills && userData.skills.length > 0 ? (
+                  userData.skills.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center bg-[#2d3448] text-white px-3 py-1.5 rounded-full text-sm"
+                    >
+                      <span>{skill.name || skill}</span>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await axios.post(
+                              `${BASE_URL}/auth/delete-skill`,
+                              { skillName: skill.name || skill },
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${token}`,
+                                },
+                              }
+                            );
+
+                            setUserData((prev) => ({
+                              ...prev,
+                              skills: res.data.skills,
+                            }));
+
+                            toast.success(
+                              `"${skill.name || skill}" removed successfully`
+                            );
+                          } catch (err) {
+                            console.error("Error deleting skill:", err);
+                            toast.error(
+                              err.response?.data?.message ||
+                                "Failed to delete skill"
+                            );
+                          }
+                        }}
+                        className="ml-2 text-white hover:text-gray-300"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm mb-4">
+                    No skills added yet.
+                  </p>
+                )}
+              </div>
+
+              {/* Add Skill Input */}
+              <div className="flex flex-col sm:flex-row gap-3 items-center">
+                <input
+                  type="text"
+                  placeholder="Skill"
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#0867bc] focus:outline-none"
+                />
+                <button
+                  onClick={handleAddSkill}
+                  className="whitespace-nowrap px-5 py-2 border border-[#0867bc] text-[#0867bc] hover:bg-[#0a78d8] hover:text-white rounded-md text-sm font-medium transition-all"
+                >
+                  Add Job Skill
+                </button>
+              </div>
+
+              {/* Optional validation message */}
+              {!userData.skills?.length && (
+                <p className="text-red-500 text-sm mt-2">
+                  Job Skill is required
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="mt-6">

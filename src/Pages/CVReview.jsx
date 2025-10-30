@@ -10,12 +10,13 @@ import Footer from "../Components/Footer";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-const CVReview = ({ user }) => {
+const CVReview = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -82,11 +83,11 @@ const CVReview = ({ user }) => {
                   className="hidden"
                 />
               </label>
-              <div className="flex gap-4 ">
+              <div className="flex md:flex-row flex-col md:gap-4 gap-2 ">
                 <button
                   onClick={handleAIReview}
                   disabled={loading}
-                  className={`mt-6 w-full text-sm px-2 py-3 text-white font-semibold rounded-xl transition duration-300 ${
+                  className={`md:mt-6 mt-4 w-full text-sm px-2 py-3 text-white font-semibold rounded-xl transition duration-300 ${
                     loading
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-gradient-to-r from-[#0867bc] to-[#0d8df7] hover:opacity-90"
@@ -105,26 +106,29 @@ const CVReview = ({ user }) => {
                 <button
                   onClick={() => {
                     if (user?.isGoldMember) {
-                      // ✅ Gold member: allow access
-                      navigate("/professional-review");
+                      const whatsappNumber = "2349153070499"; // your WhatsApp number (no '+')
+                      const message = encodeURIComponent(
+                        `Hello! I’m a Gold Member and I’d like a professional review of my CV.${
+                          file ? ` My CV file name is "${file.name}".` : ""
+                        }`
+                      );
+                      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${message}`;
+                      window.open(whatsappURL, "_blank");
                     } else {
-                      // ❌ Not gold: show alert and redirect
                       Swal.fire({
-                        icon: "warning",
-                        title: "Gold Membership Required",
-                        text: "This feature is exclusive to Gold Members. Upgrade to access professional CV review.",
-                        confirmButtonText: "View Plans",
-                        confirmButtonColor: "#0867bc",
-                        showCancelButton: true,
-                        cancelButtonText: "Cancel",
+                        icon: "info",
+                        title: "Membership Required",
+                        text: "This feature is exclusive to Gold Members. Pay a one time fee to access professional CV review.",
+                        confirmButtonText: "Upgrade Now",
+                        confirmButtonColor: "#1967d2",
                       }).then((result) => {
                         if (result.isConfirmed) {
-                          navigate("/pricing-page");
+                          window.location.href = "/pricing-page"; // redirect to your membership page
                         }
                       });
                     }
                   }}
-                  className="mt-6 w-full py-3 whitespace-nowrap px-2 text-sm text-white font-semibold rounded-xl bg-gradient-to-r from-yellow-500 to-yellow-600 hover:opacity-90 transition duration-300"
+                  className="md:mt-6 mt-0 w-full py-3 whitespace-nowrap px-2 text-sm text-white font-semibold rounded-xl bg-gradient-to-r from-yellow-500 to-yellow-600 hover:opacity-90 transition duration-300"
                 >
                   CV Review by Professionals
                 </button>

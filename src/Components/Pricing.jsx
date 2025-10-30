@@ -6,10 +6,23 @@ import Header from "./Header";
 import PricingDetails from "./PricingDetails";
 import Footer from "./Footer";
 import BASE_URL from "../config";
+import { jwtDecode } from "jwt-decode";
+
+const isTokenValid = (token) => {
+  try {
+    const decoded = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    return decoded.exp > currentTime;
+  } catch (error) {
+    return false;
+  }
+};
 
 const Pricing = () => {
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user")); // ✅ assuming you store it after login
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const validToken = token && isTokenValid(token);
 
   const plans = [
     {
@@ -106,16 +119,18 @@ const Pricing = () => {
             </div>
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl w-full">
               {plans.map((plan, i) => {
-                const alreadyBought = user && user[plan.userField];
+                const alreadyBought =
+                  validToken && user && user[plan.userField];
 
                 return (
                   <div
                     key={i}
+                    data-plan={plan.name} // 👈 added
                     className={`relative bg-white rounded-2xl shadow-md border ${
                       plan.highlighted
                         ? "bg-white rounded-lg shadow-lg border-2 border-yellow-400 relative"
                         : "border-gray-200"
-                    } p-8 flex flex-col`}
+                    } p-8 flex flex-col transition-all duration-300`}
                   >
                     {plan.highlighted && (
                       <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">

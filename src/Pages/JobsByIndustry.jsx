@@ -34,6 +34,7 @@ const industries = [
 ];
 
 const locations = [
+  "Remote (Work From Home)",
   "Abeokuta & Ogun State",
   "Abuja",
   "Benue",
@@ -70,15 +71,19 @@ const locations = [
   "Sokoto",
 ];
 
-const jobTypes = ["Remote", "Full Time", "Contract", "Part Time"];
+const jobTypes = [
+  "Full Time",
+  "Contract",
+  "Part Time",
+  "Internship & Graduate",
+];
 
-const JobsByExperience = () => {
-  const { level } = useParams();
+const JobsByIndustry = () => {
+  const { industry } = useParams();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    experience: decodeURIComponent(level),
-    industry: "",
+    industry: decodeURIComponent(industry),
     location: "",
     jobType: "",
   });
@@ -94,7 +99,7 @@ const JobsByExperience = () => {
       const res = await axios.get(`${BASE_URL}/user/jobs/filter?${params}`);
       setJobs(res.data);
     } catch (err) {
-      //console.error(err);
+      toast.error("Failed to fetch jobs");
     } finally {
       setLoading(false);
     }
@@ -114,14 +119,13 @@ const JobsByExperience = () => {
 
   return (
     <>
-      {" "}
       <Header />
       <section className="py-20 container font-outfit mx-auto px-4 2xl:px-20">
         <div className="flex flex-col lg:flex-row gap-10">
           {/* LEFT SIDE */}
           <div className="flex-1">
             <h2 className="text-2xl font-semibold mb-6">
-              {filters.experience} Jobs ({jobs.length})
+              {filters.industry} Jobs ({jobs.length})
             </h2>
             {loading ? (
               <p>Loading...</p>
@@ -229,4 +233,4 @@ const FilterSection = ({ title, options, selected, onSelect }) => {
   );
 };
 
-export default JobsByExperience;
+export default JobsByIndustry;
