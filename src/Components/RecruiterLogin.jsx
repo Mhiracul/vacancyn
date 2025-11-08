@@ -119,12 +119,11 @@ const RecruiterLogin = () => {
 
       if (rememberMe) {
         localStorage.setItem("rememberEmail", workEmail);
-
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(res.data.recruiter));
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(recruiter));
       } else {
-        sessionStorage.setItem("token", res.data.token);
-        sessionStorage.setItem("user", JSON.stringify(res.data.recruiter));
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("user", JSON.stringify(recruiter));
       }
 
       toast.success("✅ Login successful!");
