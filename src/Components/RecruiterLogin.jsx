@@ -138,9 +138,16 @@ const RecruiterLogin = () => {
         }
       }, 1500);
     } catch (err) {
-      //console.error(err.response?.data || err.message);
-
       const errorMsg = err.response?.data?.message || "Login failed";
+
+      if (err.response?.status === 403 && err.response?.data?.resend) {
+        toast.error(errorMsg);
+        // Redirect to verify page with the email prefilled
+        navigate("/verify-email", {
+          state: { email: err.response.data.email },
+        });
+        return;
+      }
 
       if (errorMsg.includes("Invalid password")) {
         toast.error("❌ Incorrect password. Please try again.");
